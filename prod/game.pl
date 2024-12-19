@@ -61,19 +61,25 @@ Data::load_file('data/virus.dat');
 
 # Game loop state
 my $game_running = 1;
+my $screen_cleared = 0; # Track whether the screen has been cleared
 
 # Main game loop
 while ($game_running) {
+    # Clear the screen only once at the beginning
+    if (!$screen_cleared) {
+        clear_screen();
+        $screen_cleared = 1;
+    }
+
     # Display BBS admin console header
     my $current_time = strftime("%Y-%m-%d %H:%M:%S", localtime);
     my %player_stats = Player::get_stats();
     my $current_score = Score::calculate_score(%player_stats);
 
-    clear_screen();
-    print "===============================================================\n";
+    print "===========================================\n";
     print "*** $bbs_name Admin Console ***\n";
     print "Date and Time: $current_time\n";
-    print "===============================================================\n";
+    print "===========================================\n";
     print "Commands:\n";
     print "    W - Work on your BBS to attract users and resources.\n";
     print "    M - Mall of the Future (coming soon).\n";
@@ -81,10 +87,11 @@ while ($game_running) {
     print "    R - View reports on your progress and score.\n";
     print "    N - Network (coming soon).\n";
     print "    S - Save Game.\n";
+    print "    C - Clear Screen.\n";
     print "    Q - Quit the game.\n";
-    print "\n===============================================================\n";
+    print "\n===========================================\n";
     print "Current Score: $current_score   ||  Remaining Actions: $player_stats{actions_remaining}\n";
-    print "===============================================================\n";
+    print "===========================================\n";
     print "\nCommand: ";
 
     # Get player command
@@ -120,6 +127,9 @@ while ($game_running) {
         my $save_file = "$USER_DIR/$bbs_name.vso";
         Player::save_game($save_file);
         print "Game saved successfully to $save_file\n";
+    } elsif ($command eq 'C') {
+        # Clear screen command
+        clear_screen();
     } elsif ($command eq 'Q') {
         # Quit command
         $game_running = 0;
