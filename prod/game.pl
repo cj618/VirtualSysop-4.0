@@ -22,7 +22,7 @@ my $USER_DIR = "users";
 # Ensure user directory exists
 make_path($USER_DIR) unless -d $USER_DIR;
 
-# Clear the screen when the game starts
+# Clear the screen
 sub clear_screen {
     print "\033[2J\033[H";  # ANSI escape codes to clear screen and reset cursor
 }
@@ -59,9 +59,6 @@ my $game_running = 1;
 
 # Main game loop
 while ($game_running) {
-    # Clear the screen at the start of each loop
-    clear_screen();
-
     # Display BBS admin console header
     my $current_time = strftime("%Y-%m-%d %H:%M:%S", localtime);
     print "\n===========================================\n";
@@ -120,4 +117,3 @@ while ($game_running) {
 }
 
 print "Game over. Goodbye!\n";
-
