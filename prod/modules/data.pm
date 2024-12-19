@@ -26,6 +26,8 @@ sub load_file {
         _parse_text_file($filename);
     } elsif ($filename =~ /virus\.dat$/) {
         _parse_list_file($filename, 'viruses');
+    } elsif ($filename =~ /CPU\.DAT$/) {
+        _parse_list_file($filename, 'cpu');
     } else {
         warn "Unknown file type: $filename\n";
     }
@@ -88,7 +90,7 @@ sub _parse_text_file {
     close $fh;
 }
 
-# Parse simple list files like virus.dat
+# Parse simple list files like virus.dat or CPU.DAT
 sub _parse_list_file {
     my ($filename, $key) = @_;
     open my $fh, '<', $filename or die "Cannot open $filename: $!\n";
@@ -103,4 +105,11 @@ sub _parse_list_file {
     close $fh;
 }
 
+# Randomly trigger less frequent hardware upgrades
+sub random_hardware_upgrade {
+    my $probability = int(rand(100));
+    return $probability < 10;  # 10% chance for upgrade event
+}
+
 1; # Return true for module loading
+

@@ -7,16 +7,19 @@ use warnings;
 sub recalculate_metrics {
     my (%player_stats) = @_;
 
-    # Adjust user growth based on upgrades and satisfaction
+    # Adjust user growth based on satisfaction and hardware level
     my $growth_multiplier = 1 + ($player_stats{satisfaction} / 100);
-    $player_stats{free_users} += int(($player_stats{inventory}->{"Server Rack"} // 0) * $growth_multiplier);
+    my $hardware_bonus = $player_stats{hardware_level} * 5;
+
+    $player_stats{free_users} += int($hardware_bonus * $growth_multiplier);
     $player_stats{paying_users} += int(($player_stats{inventory}->{"Premium Subscription"} // 0) * $growth_multiplier / 2);
 
-    # Adjust satisfaction based on actions and upgrades
+    # Adjust satisfaction based on actions and hardware quality
     $player_stats{satisfaction} += $player_stats{inventory}->{"Entertainment System"} // 0;
     $player_stats{satisfaction} -= $player_stats{actions_remaining} < 10 ? 5 : 0; # Penalize low actions
+    $player_stats{satisfaction} += $hardware_bonus / 10; # Boost satisfaction with better hardware
 
-    # Cap satisfaction at 100
+    # Cap satisfaction between 0 and 100
     $player_stats{satisfaction} = 100 if $player_stats{satisfaction} > 100;
     $player_stats{satisfaction} = 0 if $player_stats{satisfaction} < 0;
 
@@ -43,6 +46,9 @@ sub check_achievements {
     }
     if ($player_stats{satisfaction} >= 90 && !grep { $_ eq "User Favorite" } @{$player_stats{achievements}}) {
         push @new_achievements, "User Favorite";
+    }
+    if ($player_stats{hardware_level} >= 5 && !grep { $_ eq "Hardware Guru" } @{$player_stats{achievements}}) {
+        push @new_achievements, "Hardware Guru";
     }
 
     return @new_achievements;

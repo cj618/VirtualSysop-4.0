@@ -60,6 +60,7 @@ Data::load_file('data/msgsr.dat');
 Data::load_file('data/msgsv.dat');
 Data::load_file('data/text.dat');
 Data::load_file('data/virus.dat');
+Data::load_file('data/CPU.DAT');
 
 # Track player stats history for reports
 my @stats_history;
@@ -79,37 +80,48 @@ while ($game_running) {
     # Display BBS admin console header
     UI::display_admin_console($bbs_name, \%player_stats, $current_time);
 
+    # Check for hardware upgrades
+    Player::upgrade_hardware();
+
     # Get player command
     my $command = UI::get_player_input();
 
     if ($command eq 'W') {
         # Work command
-        my @events = Event::trigger_events();
-        foreach my $event (@events) {
-            UI::display_event($event);
-            # Apply event impacts to player stats
-            foreach my $key (keys %{$event->{impact}}) {
-                $player_stats{$key} += $event->{impact}{$key};
+        if (Player::deduct_actions(10)) {
+            $player_stats{actions_remaining} -= 10;
+            my @events = Event::trigger_events();
+            foreach my $event (@events) {
+                UI::display_event($event);
+                # Apply event impacts to player stats
+                foreach my $key (keys %{$event->{impact}}) {
+                    $player_stats{$key} += $event->{impact}{$key};
+                }
             }
+            Player::update_stats(%player_stats);
+        } else {
+            UI::display_error("Not enough actions remaining for this task.");
         }
-        Player::update_stats(%player_stats);
-        Player::deduct_actions(Score::adjust_action_costs(%player_stats));
     } elsif ($command eq 'M') {
         # Mall of the Future command
         my $updated_stats = UI::handle_purchase(\%player_stats);
         Player::update_stats(%$updated_stats);
     } elsif ($command eq 'V') {
         # Virus scan command
-        my @events = Event::trigger_events();
-        foreach my $event (@events) {
-            UI::display_event($event);
-            # Apply event impacts to player stats
-            foreach my $key (keys %{$event->{impact}}) {
-                $player_stats{$key} += $event->{impact}{$key};
+        if (Player::deduct_actions(8)) {
+            $player_stats{actions_remaining} -= 8;
+            my @events = Event::trigger_events();
+            foreach my $event (@events) {
+                UI::display_event($event);
+                # Apply event impacts to player stats
+                foreach my $key (keys %{$event->{impact}}) {
+                    $player_stats{$key} += $event->{impact}{$key};
+                }
             }
+            Player::update_stats(%player_stats);
+        } else {
+            UI::display_error("Not enough actions remaining for this task.");
         }
-        Player::update_stats(%player_stats);
-        Player::deduct_actions(8); # Deduct 8 actions for virus scanning
     } elsif ($command eq 'R') {
         # Reports command
         print "\nChoose a report to view:\n";

@@ -3,6 +3,7 @@ package UI;
 use strict;
 use warnings;
 use POSIX qw(strftime);
+use Data;
 
 # Displays an error message
 sub display_error {
@@ -55,8 +56,8 @@ sub handle_purchase {
         ], $player_stats_ref);
     } elsif ($choice == 5) {
         _visit_store("7-Eleven", [
-            { name => "Soda", cost => 5, effect => { actions_remaining => 5 } },
-            { name => "Snacks", cost => 10, effect => { actions_remaining => 10 } }
+            { name => "Soda", cost => 5, effect => { actions_remaining => 5, daily_action_limit => 5 } },
+            { name => "Snacks", cost => 10, effect => { actions_remaining => 10, daily_action_limit => 10 } }
         ], $player_stats_ref);
     } else {
         print "Exiting the mall.\n";
@@ -103,12 +104,17 @@ sub display_admin_console {
     my ($bbs_name, $player_stats, $current_time) = @_;
     my $formatted_time = POSIX::strftime("%Y-%m-%d %H:%M:%S", localtime($current_time));
 
+    my $hardware_list = Data::get_data('cpu');
+    my $current_hardware = $hardware_list->[$player_stats->{hardware_level}] // 'Unknown';
+
     print "===========================================\n";
     print "*** $bbs_name Admin Console ***\n";
     print "Date and Time: $formatted_time\n";
     print "===========================================\n";
     print " Free Users: $player_stats->{free_users}     |  Bank acct: \$ $player_stats->{money}\n";
     print " Paying Users: $player_stats->{paying_users}   |  Employees: $player_stats->{employees}\n";
+    print " Daily Actions Remaining: $player_stats->{actions_remaining} / $player_stats->{daily_action_limit}\n";
+    print " Hardware: $current_hardware\n";
     print "===========================================\n\n";
     print "    W - Work on your BBS to attract users and resources.\n";
     print "    M - Mall of the Future.\n";
