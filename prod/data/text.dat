@@ -1,0 +1,50 @@
+; TEXT.DAT - Virtual Sysop Game Text
+;
+; This file contains text messages for various parts of the game.
+; Format: NNNN <Text>
+
+; Main menu prompt
+0001 Welcome to Virtual SysOp! Manage your BBS and become the best sysop in the world.
+
+; Help menu
+0002 Commands:
+     W - Work on your BBS to attract users and resources.
+     M - Check your mail and respond to user feedback.
+     V - Scan for and remove viruses from your system.
+     S - Visit the store to upgrade hardware and software.
+     R - View reports on your progress and score.
+     C - Adjust user subscription charges.
+     Q - Quit the game.
+
+; Action confirmation
+0003 Action successfully completed.
+
+; Invalid input
+0004 Invalid command. Please try again.
+
+; Game start
+0005 The game is starting. Good luck on your journey to sysop stardom!
+
+; Quit confirmation
+0006 Are you sure you want to quit? Y/N
+
+; Game over
+0007 Thank you for playing Virtual SysOp! Your final score is:
+
+; End of day summary
+0008 End of Day Report:
+     Users gained: ~USERS_GAINED
+     Users lost: ~USERS_LOST
+     Satisfaction change: ~SATISFACTION_CHANGE%
+
+; Store placeholder
+0009 The store functionality is currently under development. Stay tuned!
+
+; Virus scan placeholder
+0010 Scanning for viruses...
+
+; Mail check placeholder
+0011 Checking your inbox for new messages...
+
+; Error messages
+0012 An error occurred while processing your request. Please try again later.
