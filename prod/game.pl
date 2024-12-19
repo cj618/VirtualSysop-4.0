@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+use lib './modules';
+
 # Import modules
 use Data;
 use Event;
