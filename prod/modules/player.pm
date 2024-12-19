@@ -1,5 +1,3 @@
-package Player;
-
 use strict;
 use warnings;
 
@@ -12,6 +10,7 @@ my %player = (
     actions_remaining => 100, # Actions per day
     money             => 500, # Starting currency
     achievements      => [],  # List of achievements
+    problems_resolved => 0,   # Initialize to avoid warnings
 );
 
 # Initialize the player profile
@@ -24,6 +23,7 @@ sub initialize {
         actions_remaining => 100,
         money             => 500,
         achievements      => [],
+        problems_resolved => 0,  # Reset this during initialization
     );
 }
 
@@ -72,6 +72,7 @@ sub display_stats {
     print "Actions Remaining: $player{actions_remaining}\n";
     print "Money            : \$ $player{money}\n";
     print "Achievements     : ", join(", ", @{$player{achievements}}), "\n";
+    print "Problems Resolved: $player{problems_resolved}\n";
     print "=============================================\n";
 }
 

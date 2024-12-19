@@ -20,7 +20,7 @@ sub calculate_score {
     my $normalized_satisfaction = $stats{satisfaction} / 100;
     my $normalized_users = (($stats{free_users} * 0.5) + $stats{paying_users}) / ($total_users || 1);
     my $normalized_hardware = $stats{hardware_quality} / 10; # Assume max hardware quality is 10
-    my $normalized_efficiency = $stats{problems_resolved} / 10; # Assume max problems resolved is 10
+    my $normalized_efficiency = ($stats{problems_resolved} // 0) / 10; # Use default if undefined
 
     # Weighted score calculation
     my $score = (
