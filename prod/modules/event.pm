@@ -17,6 +17,9 @@ my @rare_events = (
     { description => 'A celebrity endorsed your BBS!', impact => { free_users => 50, paying_users => 10 } },
     { description => 'Major hardware failure!', impact => { hardware_quality => -5, satisfaction => -10 } },
     { description => 'A viral post brought in a surge of users!', impact => { free_users => 100 } },
+    { description => 'Your BBS was featured on a tech blog!', impact => { free_users => 30, satisfaction => 5 } },
+    { description => 'Hackers attempted to breach your system!', impact => { satisfaction => -15, virus_protection => -1 } },
+    { description => 'You received a grant for system upgrades!', impact => { money => 200, hardware_quality => 3 } },
 );
 
 # Trigger random events

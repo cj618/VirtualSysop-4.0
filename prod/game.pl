@@ -111,7 +111,12 @@ while ($game_running) {
         my @events = Event::trigger_events();
         foreach my $event (@events) {
             UI::display_event($event);
+            # Apply event impacts to player stats
+            foreach my $key (keys %{$event->{impact}}) {
+                $player_stats{$key} += $event->{impact}{$key};
+            }
         }
+        Player::update_stats(%player_stats);
         Player::deduct_actions(10); # Deduct 10 actions for working
     } elsif ($command eq 'M') {
         # Mall of the Future command
@@ -122,7 +127,12 @@ while ($game_running) {
         my @events = Event::trigger_events();
         foreach my $event (@events) {
             UI::display_event($event);
+            # Apply event impacts to player stats
+            foreach my $key (keys %{$event->{impact}}) {
+                $player_stats{$key} += $event->{impact}{$key};
+            }
         }
+        Player::update_stats(%player_stats);
         Player::deduct_actions(8); # Deduct 8 actions for virus scanning
     } elsif ($command eq 'R') {
         # Reports command

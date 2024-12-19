@@ -34,6 +34,21 @@ sub update_rivals {
             $rival->{hardware_quality}++;
             $rival->{hardware_quality} = 10 if $rival->{hardware_quality} > 10;
         }
+
+        # Add effects of rare events
+        if (rand() < 0.1) { # 10% chance of rare impact
+            my $event_type = int(rand(3));
+            if ($event_type == 0) {
+                $rival->{free_users} -= 30;
+                print "$rival->{name} lost users due to a bad review.\n";
+            } elsif ($event_type == 1) {
+                $rival->{hardware_quality} -= 2;
+                print "$rival->{name} suffered hardware failures.\n";
+            } elsif ($event_type == 2) {
+                $rival->{satisfaction} += 5;
+                print "$rival->{name} implemented a successful marketing campaign.\n";
+            }
+        }
     }
 }
 
