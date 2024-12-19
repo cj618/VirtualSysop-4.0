@@ -34,13 +34,14 @@ my $choice = <STDIN>;
 chomp($choice);
 my $bbs_name;
 if (uc($choice) eq 'L') {
-    print "Enter the name of the saved game file: ";
+    print "Enter the name of your saved BBS (without extension): ";
     my $save_file = <STDIN>;
     chomp($save_file);
-    if (-e "$USER_DIR/$save_file") {
-        Player::load_game("$USER_DIR/$save_file");
+    $save_file = "$USER_DIR/$save_file.vso";
+    if (-e $save_file) {
+        Player::load_game($save_file);
         print "Game loaded successfully!\n";
-        $bbs_name = $save_file;
+        ($bbs_name) = $save_file =~ m|/([^/]+)\.vso$|;
     } else {
         print "Save file not found. Starting a new game instead.\n";
         Player::initialize();
@@ -116,10 +117,9 @@ while ($game_running) {
         UI::display_message("Charge users functionality is under development.");
     } elsif ($command eq 'SAVE') {
         # Save game command
-        print "Enter the filename to save your game: ";
-        my $save_file = <STDIN>;
-        chomp($save_file);
-        Player::save_game("$USER_DIR/$save_file");
+        my $save_file = "$USER_DIR/$bbs_name.vso";
+        Player::save_game($save_file);
+        print "Game saved successfully to $save_file\n";
     } elsif ($command eq 'Q') {
         # Quit command
         $game_running = 0;
@@ -133,4 +133,3 @@ while ($game_running) {
 }
 
 print "Game over. Goodbye!\n";
-
