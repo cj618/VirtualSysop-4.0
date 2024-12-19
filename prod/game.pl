@@ -14,6 +14,7 @@ use Event;
 use Player;
 use UI;
 use Score;
+use Rival;
 
 # Constants
 my $USER_DIR = "users";
