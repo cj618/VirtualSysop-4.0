@@ -85,13 +85,14 @@ while ($game_running) {
     print "    M - Mall of the Future.\n";
     print "    V - Scan for and remove viruses from your system.\n";
     print "    R - View reports on your progress and score.\n";
-    print "    N - Network (coming soon).\n";
+    print "    N - Network with rivals.\n";
     print "    S - Save Game.\n";
     print "    C - Clear Screen.\n";
     print "    Q - Quit the game.\n";
     print "\n===========================================\n";
     print "Current Score: $current_score   ||  Remaining Actions: $player_stats{actions_remaining}\n";
     print "===========================================\n";
+    print "\nCommand: ";
 
     # Get player command
     my $command = UI::get_player_input();
@@ -131,8 +132,33 @@ while ($game_running) {
         my $score = Score::calculate_score(%stats);
         Score::display_score($score, %stats);
     } elsif ($command eq 'N') {
-        # Network command (placeholder)
-        UI::display_message("Network functionality is under development.");
+        # Network command
+        Rival::display_rivals();
+        print "\nChoose a rival to interact with (enter name or type C to cancel): ";
+        my $rival_name = <STDIN>;
+        chomp($rival_name);
+
+        if (uc($rival_name) eq 'C') {
+            print "Returning to main menu.\n";
+        } else {
+            print "Choose an action: (P)artnership or (C)ompetition: ";
+            my $action = <STDIN>;
+            chomp($action);
+
+            if (uc($action) eq 'P') {
+                my $result = Rival::interact_with_rival($rival_name, 'partnership');
+                foreach my $key (keys %$result) {
+                    $player_stats{$key} += $result->{$key};
+                }
+            } elsif (uc($action) eq 'C') {
+                my $result = Rival::interact_with_rival($rival_name, 'competition');
+                foreach my $key (keys %$result) {
+                    $player_stats{$key} += $result->{$key};
+                }
+            } else {
+                print "Invalid action. Returning to main menu.\n";
+            }
+        }
     } elsif ($command eq 'S') {
         # Save game command
         my $save_file = "$USER_DIR/$bbs_name.vso";
