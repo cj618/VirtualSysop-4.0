@@ -2,8 +2,12 @@
 
 use strict;
 use warnings;
+use File::Path qw(make_path);
+use POSIX qw(strftime);
 
+# Show it where the modules live
 use lib './modules';
+
 
 # Import modules
 use Data;
@@ -11,6 +15,34 @@ use Event;
 use Player;
 use UI;
 use Score;
+
+# Constants
+my $USER_DIR = "users";
+
+# Ensure user directory exists
+make_path($USER_DIR) unless -d $USER_DIR;
+
+# Clear the screen when the game starts
+sub clear_screen {
+    print "\033[2J\033[H";  # ANSI escape codes to clear screen and reset cursor
+}
+
+# Prompt user to set or load BBS name
+clear_screen();
+print "Welcome to Virtual SysOp!\n";
+print "Enter the name of your BBS: ";
+my $bbs_name = <STDIN>;
+chomp($bbs_name);
+my $user_file = "$USER_DIR/$bbs_name.dat";
+
+# Check if user file exists
+if (-e $user_file) {
+    print "Loading existing BBS data for '$bbs_name'...\n";
+    # Future implementation: Load saved game data
+} else {
+    print "Creating a new BBS named '$bbs_name'...\n";
+    # Future implementation: Initialize new game data and save
+}
 
 # Initialize game state
 Player::initialize();
@@ -27,6 +59,16 @@ my $game_running = 1;
 
 # Main game loop
 while ($game_running) {
+    # Clear the screen at the start of each loop
+    clear_screen();
+
+    # Display BBS admin console header
+    my $current_time = strftime("%Y-%m-%d %H:%M:%S", localtime);
+    print "\n===========================================\n";
+    print "$bbs_name Admin Console\n";
+    print "Date and Time: $current_time\n";
+    print "===========================================\n";
+
     # Display main menu
     UI::display_menu();
     
@@ -78,3 +120,4 @@ while ($game_running) {
 }
 
 print "Game over. Goodbye!\n";
+
