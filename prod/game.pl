@@ -8,10 +8,6 @@ use POSIX qw(strftime);
 # Show it where the modules live
 use lib './modules';
 
-# DEBUGGING 
-Player::initialize();
-print "Player initialized successfully\n";
-
 # Import modules
 use Data;
 use Event;

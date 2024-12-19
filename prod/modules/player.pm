@@ -1,3 +1,5 @@
+package Player
+
 use strict;
 use warnings;
 
