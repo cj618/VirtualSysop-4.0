@@ -3,47 +3,65 @@ package Score;
 use strict;
 use warnings;
 
-# Scoring weight configuration
-my %weights = (
-    user_satisfaction => 0.4,  # 40% weight
-    number_of_users   => 0.3,  # 30% weight
-    hardware_quality  => 0.2,  # 20% weight
-    problem_efficiency => 0.1, # 10% weight
-);
+# Recalculate success metrics based on updated game dynamics
+sub recalculate_metrics {
+    my (%player_stats) = @_;
 
-# Calculate the score
-sub calculate_score {
-    my (%stats) = @_;
+    # Calculate money based on paid users
+    my $income_from_users = $player_stats{paying_users} * 10; # Each paying user generates $10
+    my $expenses = $player_stats{expenses} || 0; # Track expenses dynamically
+    
+    # Update money
+    $player_stats{money} += $income_from_users - $expenses;
 
-    # Normalize values
-    my $total_users = $stats{free_users} + $stats{paying_users};
-    my $normalized_satisfaction = $stats{satisfaction} / 100;
-    my $normalized_users = (($stats{free_users} * 0.5) + $stats{paying_users}) / ($total_users || 1);
-    my $normalized_hardware = $stats{hardware_quality} / 10; # Assume max hardware quality is 10
-    my $normalized_efficiency = ($stats{problems_resolved} // 0) / 10; # Use default if undefined
+    # Ensure money doesn't go negative
+    $player_stats{money} = 0 if $player_stats{money} < 0;
 
-    # Weighted score calculation
-    my $score = (
-        $normalized_satisfaction * $weights{user_satisfaction} +
-        $normalized_users * $weights{number_of_users} +
-        $normalized_hardware * $weights{hardware_quality} +
-        $normalized_efficiency * $weights{problem_efficiency}
-    ) * 1000;  # Scale to a 1000-point system
+    # Free users increase satisfaction
+    $player_stats{satisfaction} += int($player_stats{free_users} / 50);
+    $player_stats{satisfaction} = 100 if $player_stats{satisfaction} > 100;
 
-    return int($score); # Round to integer
+    return %player_stats;
 }
 
-# Display score details
-sub display_score {
-    my ($score, %stats) = @_;
+# Display key success metrics
+sub display_metrics {
+    my (%player_stats) = @_;
 
-    print "\n================ Score Report =================\n";
-    print "User Satisfaction : $stats{satisfaction}%\n";
-    print "Total Users       : $stats{free_users} free, $stats{paying_users} paying\n";
-    print "Hardware Quality  : $stats{hardware_quality}/10\n";
-    print "Problem Efficiency: $stats{problems_resolved}/10\n";
-    print "Final Score       : $score\n";
-    print "=============================================\n";
+    print "===========================================\n";
+    print "Success Metrics:\n";
+    print "  Free Users: $player_stats{free_users}\n";
+    print "  Paying Users: $player_stats{paying_users}\n";
+    print "  Money: \$ $player_stats{money}\n";
+    print "  Employees: $player_stats{employees}\n";
+    print "===========================================\n";
+}
+
+# Deduct expenses for purchases or events
+sub deduct_expenses {
+    my ($amount, %player_stats) = @_;
+
+    $player_stats{expenses} += $amount;
+    print "\$ $amount has been deducted for expenses.\n";
+
+    return %player_stats;
+}
+
+# Update metrics after each action
+sub update_after_action {
+    my ($action_type, %player_stats) = @_;
+
+    if ($action_type eq 'work') {
+        $player_stats{free_users} += int(rand(20));
+        $player_stats{paying_users} += int(rand(5));
+    } elsif ($action_type eq 'virus_scan') {
+        $player_stats{free_users} -= int(rand(10));
+        $player_stats{satisfaction} += 2;
+    } elsif ($action_type eq 'network') {
+        $player_stats{free_users} += int(rand(15));
+    }
+
+    return %player_stats;
 }
 
 1; # Return true for module loading
