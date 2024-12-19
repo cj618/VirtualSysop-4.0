@@ -5,6 +5,10 @@ use warnings;
 use File::Path qw(make_path);
 use POSIX qw(strftime);
 
+# Tell it where the modules live
+use lib './modules';
+
+
 # Import modules
 use Data;
 use Event;
