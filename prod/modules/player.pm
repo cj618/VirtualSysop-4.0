@@ -1,4 +1,4 @@
-package Player
+package Player;
 
 use strict;
 use warnings;
