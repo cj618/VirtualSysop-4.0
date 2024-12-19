@@ -1,107 +1,37 @@
-use strict;
-use warnings;
-use File::Path qw(make_path);
-use POSIX qw(strftime);
+; TEXT.DAT - Virtual SysOp Game Text
+;
+; Format: NNNN <Text>
 
-# Import modules
-use Data;
-use Event;
-use Player;
-use UI;
-use Score;
+; Introduction and Prompts
+0001 Welcome to Virtual SysOp! Manage your BBS and become the best sysop in the world.
+0002 Enter the name of your BBS:
+0003 Commands:
+     W - Work on your BBS to attract users and resources.
+     M - Check your mail and respond to user feedback.
+     V - Scan for and remove viruses from your system.
+     S - Visit the store to upgrade hardware and software.
+     R - View reports on your progress and score.
+     C - Adjust user subscription charges.
+     Q - Quit the game.
 
-# Constants
-my $USER_DIR = "users";
+; Feedback Messages
+0004 Action successfully completed.
+0005 Invalid command. Please try again.
 
-# Ensure user directory exists
-make_path($USER_DIR) unless -d $USER_DIR;
+; Event Placeholders
+0006 Scanning for viruses...
+0007 Checking your inbox for new messages...
 
-# Prompt user to set or load BBS name
-print "Welcome to Virtual SysOp!\n";
-print "Enter the name of your BBS: ";
-my $bbs_name = <STDIN>;
-chomp($bbs_name);
-my $user_file = "$USER_DIR/$bbs_name.dat";
+; Game Status and Endings
+0008 End of Day Report:
+     Users gained: ~USERS_GAINED
+     Users lost: ~USERS_LOST
+     Satisfaction change: ~SATISFACTION_CHANGE%
+0009 Thank you for playing Virtual SysOp! Your final score is:
 
-# Check if user file exists
-if (-e $user_file) {
-    print "Loading existing BBS data for '$bbs_name'...\n";
-    # Future implementation: Load saved game data
-} else {
-    print "Creating a new BBS named '$bbs_name'...\n";
-    # Future implementation: Initialize new game data and save
-}
+; Placeholder Features
+0010 Store functionality is under development. Stay tuned!
+0011 Charge users functionality is coming soon.
 
-# Initialize game state
-Player::initialize();
-
-# Load data files
-Data::load_file('data/msgsa.dat');
-Data::load_file('data/msgsr.dat');
-Data::load_file('data/msgsv.dat');
-Data::load_file('data/text.dat');
-Data::load_file('data/virus.dat');
-
-# Game loop state
-my $game_running = 1;
-
-# Main game loop
-while ($game_running) {
-    # Display BBS admin console header
-    my $current_time = strftime("%Y-%m-%d %H:%M:%S", localtime);
-    print "\n===========================================\n";
-    print "$bbs_name Admin Console\n";
-    print "Date and Time: $current_time\n";
-    print "===========================================\n";
-
-    # Display main menu
-    UI::display_menu();
-    
-    # Get player command
-    my $command = UI::get_player_input();
-
-    if ($command eq 'W') {
-        # Work command
-        my @events = Event::trigger_events();
-        foreach my $event (@events) {
-            UI::display_event($event);
-        }
-        Player::deduct_actions(10); # Deduct 10 actions for working
-    } elsif ($command eq 'M') {
-        # Check mail command
-        my @events = Event::trigger_events();
-        foreach my $event (@events) {
-            UI::display_event($event);
-        }
-        Player::deduct_actions(5); # Deduct 5 actions for checking mail
-    } elsif ($command eq 'V') {
-        # Virus scan command
-        my @events = Event::trigger_events();
-        foreach my $event (@events) {
-            UI::display_event($event);
-        }
-        Player::deduct_actions(8); # Deduct 8 actions for virus scanning
-    } elsif ($command eq 'S') {
-        # Store command (placeholder)
-        UI::display_message("Store functionality is under development.");
-    } elsif ($command eq 'R') {
-        # Report command
-        my %stats = Player::get_stats();
-        my $score = Score::calculate_score(%stats);
-        Score::display_score($score, %stats);
-    } elsif ($command eq 'C') {
-        # Charge users command (placeholder)
-        UI::display_message("Charge users functionality is under development.");
-    } elsif ($command eq 'Q') {
-        # Quit command
-        $game_running = 0;
-        my %stats = Player::get_stats();
-        my $score = Score::calculate_score(%stats);
-        UI::display_end_game($score, $stats{achievements});
-    } else {
-        # Invalid command
-        UI::display_error("Invalid command. Please try again.");
-    }
-}
-
-print "Game over. Goodbye!\n";
+; Miscellaneous
+0012 You've discovered a hidden feature. Stay tuned for more!
