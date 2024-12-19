@@ -9,8 +9,8 @@ sub recalculate_metrics {
 
     # Adjust user growth based on upgrades and satisfaction
     my $growth_multiplier = 1 + ($player_stats{satisfaction} / 100);
-    $player_stats{free_users} += int($player_stats{inventory}->{"Server Rack"} * $growth_multiplier);
-    $player_stats{paying_users} += int($player_stats{inventory}->{"Premium Subscription"} * $growth_multiplier / 2);
+    $player_stats{free_users} += int(($player_stats{inventory}->{"Server Rack"} // 0) * $growth_multiplier);
+    $player_stats{paying_users} += int(($player_stats{inventory}->{"Premium Subscription"} // 0) * $growth_multiplier / 2);
 
     # Adjust satisfaction based on actions and upgrades
     $player_stats{satisfaction} += $player_stats{inventory}->{"Entertainment System"} // 0;
@@ -21,7 +21,7 @@ sub recalculate_metrics {
     $player_stats{satisfaction} = 0 if $player_stats{satisfaction} < 0;
 
     # Calculate expenses based on inventory and employees
-    $player_stats{expenses} = ($player_stats{employees} * 50) + ($player_stats{inventory}->{"Server Rack"} * 10);
+    $player_stats{expenses} = ($player_stats{employees} * 50) + (($player_stats{inventory}->{"Server Rack"} // 0) * 10);
     $player_stats{money} -= $player_stats{expenses};
 
     # Prevent negative money

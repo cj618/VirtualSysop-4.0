@@ -122,6 +122,13 @@ sub display_admin_console {
     print "Command: ";
 }
 
+# Gets player input for commands
+sub get_player_input {
+    my $input = <STDIN>;
+    chomp($input);
+    return uc($input); # Convert to uppercase for consistency
+}
+
 # Displays reports based on type
 sub display_report {
     my ($report_type, $data) = @_;
