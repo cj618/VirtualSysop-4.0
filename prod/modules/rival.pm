@@ -2,100 +2,93 @@ package Rival;
 
 use strict;
 use warnings;
-use List::Util qw(shuffle);
 
-# Data structure for rival BBSs
-my @rivals = (
-    { name => 'CyberNet Elite', free_users => 200, paying_users => 50, satisfaction => 80, hardware_quality => 7 },
-    { name => 'Digital Haven', free_users => 150, paying_users => 30, satisfaction => 70, hardware_quality => 6 },
-    { name => 'ByteStorm', free_users => 300, paying_users => 100, satisfaction => 85, hardware_quality => 9 },
+# Store rival stats
+my %rivals = (
+    "UltraNet" => { users => 500, money => 1000, satisfaction => 70 },
+    "DataDome" => { users => 450, money => 800, satisfaction => 65 },
+    "FastWave" => { users => 300, money => 1200, satisfaction => 75 },
 );
 
-# Get the list of rivals
-sub get_rivals {
-    return @rivals;
-}
-
-# Update rival stats (e.g., growth or events)
-sub update_rivals {
-    foreach my $rival (@rivals) {
-        # Random user growth
-        my $growth = int(rand(20));
-        $rival->{free_users} += $growth;
-        $rival->{paying_users} += int($growth / 4);
-
-        # Random satisfaction changes
-        $rival->{satisfaction} += int(rand(3)) - 1; # Slight fluctuation
-        $rival->{satisfaction} = 100 if $rival->{satisfaction} > 100;
-        $rival->{satisfaction} = 0 if $rival->{satisfaction} < 0;
-
-        # Random hardware improvements
-        if (rand() < 0.1) {
-            $rival->{hardware_quality}++;
-            $rival->{hardware_quality} = 10 if $rival->{hardware_quality} > 10;
-        }
-
-        # Add effects of rare events
-        if (rand() < 0.1) { # 10% chance of rare impact
-            my $event_type = int(rand(3));
-            if ($event_type == 0) {
-                $rival->{free_users} -= 30;
-                print "$rival->{name} lost users due to a bad review.\n";
-            } elsif ($event_type == 1) {
-                $rival->{hardware_quality} -= 2;
-                print "$rival->{name} suffered hardware failures.\n";
-            } elsif ($event_type == 2) {
-                $rival->{satisfaction} += 5;
-                print "$rival->{name} implemented a successful marketing campaign.\n";
-            }
-        }
+# Display a list of rivals
+sub display_rivals {
+    print "\nRival BBS Systems:\n";
+    print "===========================================\n";
+    foreach my $name (keys %rivals) {
+        print "$name:\n";
+        print "    Users: $rivals{$name}{users}\n";
+        print "    Money: \$ $rivals{$name}{money}\n";
+        print "    Satisfaction: $rivals{$name}{satisfaction}\n\n";
     }
+    print "===========================================\n\n";
 }
 
-# Handle rival interaction (partnership or competition)
+# Interact with a rival
 sub interact_with_rival {
     my ($rival_name, $action) = @_;
-    my ($rival) = grep { $_->{name} eq $rival_name } @rivals;
 
-    if (!$rival) {
-        warn "Rival not found: $rival_name\n";
+    if (!exists $rivals{$rival_name}) {
+        print "Rival BBS not found.\n";
         return;
     }
 
     if ($action eq 'partnership') {
-        print "You formed a partnership with $rival->{name}.
-";
-        $rival->{satisfaction} += 5;
-        return { free_users => 20, satisfaction => 5 }; # Boost to player's stats
+        return _form_partnership($rival_name);
     } elsif ($action eq 'competition') {
-        print "You competed against $rival->{name}.
-";
-        my $success = rand() < 0.5; # 50% chance of success
-        if ($success) {
-            print "You successfully poached users from $rival->{name}!
-";
-            $rival->{free_users} -= 20;
-            return { free_users => 20 }; # Boost to player's free users
-        } else {
-            print "$rival->{name} retaliated and poached your users!
-";
-            return { free_users => -10 }; # Loss to player's free users
-        }
+        return _engage_competition($rival_name);
     } else {
-        warn "Unknown action: $action\n";
+        print "Invalid action.\n";
+        return;
     }
 }
 
-# Display rival stats
-sub display_rivals {
-    print "\nRival BBS Stats:\n";
-    foreach my $rival (@rivals) {
-        print "Name: $rival->{name}\n";
-        print "  Free Users: $rival->{free_users}\n";
-        print "  Paying Users: $rival->{paying_users}\n";
-        print "  Satisfaction: $rival->{satisfaction}%\n";
-        print "  Hardware Quality: $rival->{hardware_quality}/10\n";
-        print "\n";
+# Form a partnership with a rival
+sub _form_partnership {
+    my ($rival_name) = @_;
+
+    print "\nYou have formed a partnership with $rival_name!\n";
+    my %impact = (
+        free_users => 50,
+        paying_users => 20,
+        money => 200,
+    );
+
+    # Update rival stats
+    $rivals{$rival_name}{users} += 30;
+    $rivals{$rival_name}{money} += 150;
+
+    return \%impact;
+}
+
+# Engage in competition with a rival
+sub _engage_competition {
+    my ($rival_name) = @_;
+
+    print "\nYou are competing with $rival_name!\n";
+
+    my $player_gain = int(rand(50)) + 50;
+    my $rival_loss = int(rand(30)) + 20;
+
+    my %impact = (
+        free_users => $player_gain,
+        money => 100,
+    );
+
+    # Reduce rival stats
+    $rivals{$rival_name}{users} -= $rival_loss;
+    $rivals{$rival_name}{satisfaction} -= 5;
+
+    return \%impact;
+}
+
+# Update rival stats dynamically
+sub update_rivals {
+    foreach my $name (keys %rivals) {
+        $rivals{$name}{users} += int(rand(10));
+        $rivals{$name}{money} += int(rand(50));
+        $rivals{$name}{satisfaction} += int(rand(3)) - 1; # Satisfaction fluctuates slightly
+        $rivals{$name}{satisfaction} = 100 if $rivals{$name}{satisfaction} > 100;
+        $rivals{$name}{satisfaction} = 0 if $rivals{$name}{satisfaction} < 0;
     }
 }
 

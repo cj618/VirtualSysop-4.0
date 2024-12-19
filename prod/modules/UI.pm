@@ -2,18 +2,120 @@ package UI;
 
 use strict;
 use warnings;
-use Data::Dumper;
 
-# Store items for the "Mall of the Future"
-my @store_items = (
-    { name => 'Hardware Upgrade', cost => 200, impact => { hardware_quality => 2 } },
-    { name => 'Antivirus License', cost => 150, impact => { virus_protection => 1 } },
-    { name => 'User Engagement Tool', cost => 300, impact => { satisfaction => 5 } },
-);
+# Displays an error message
+sub display_error {
+    my ($message) = @_;
+    print "Error: $message\n";
+}
 
-# Display the main menu
-sub display_menu {
-    print "Commands:\n";
+# Displays events triggered during gameplay
+sub display_event {
+    my ($event) = @_;
+    print "$event->{description}\n";
+}
+
+# Handles player purchases (Mall of the Future)
+sub handle_purchase {
+    my ($player_stats_ref) = @_;
+
+    print "\nWelcome to the Mall of the Future!\n";
+    print "Choose a store:\n";
+    print "  1. Sears (Hardware)\n";
+    print "  2. Best Buy (Software)\n";
+    print "  3. CompUSA (BBS Tools)\n";
+    print "  4. News Corporation (Marketing)\n";
+    print "  5. 7-Eleven (Food & Drinks)\n";
+    print "  6. Exit Mall\n";
+
+    print "\nEnter your choice: ";
+    my $choice = <STDIN>;
+    chomp($choice);
+
+    if ($choice == 1) {
+        _visit_store("Sears", [
+            { name => "Server Rack", cost => 500, effect => { satisfaction => 5 } },
+            { name => "Desk Setup", cost => 200, effect => { employees => 1 } }
+        ], $player_stats_ref);
+    } elsif ($choice == 2) {
+        _visit_store("Best Buy", [
+            { name => "Antivirus Software", cost => 300, effect => { virus_protection => 10 } },
+            { name => "Monitor", cost => 150, effect => { satisfaction => 3 } }
+        ], $player_stats_ref);
+    } elsif ($choice == 3) {
+        _visit_store("CompUSA", [
+            { name => "Modem", cost => 400, effect => { user_growth => 10 } },
+            { name => "Bandwidth Booster", cost => 700, effect => { user_growth => 15 } }
+        ], $player_stats_ref);
+    } elsif ($choice == 4) {
+        _visit_store("News Corporation", [
+            { name => "Radio Ad", cost => 1000, effect => { user_growth => 20 } },
+            { name => "Flyers", cost => 300, effect => { user_growth => 5 } }
+        ], $player_stats_ref);
+    } elsif ($choice == 5) {
+        _visit_store("7-Eleven", [
+            { name => "Soda", cost => 5, effect => { stamina => 5 } },
+            { name => "Snacks", cost => 10, effect => { stamina => 10 } }
+        ], $player_stats_ref);
+    } else {
+        print "Exiting the mall.\n";
+    }
+
+    return $player_stats_ref;
+}
+
+# Visits a specific store
+sub _visit_store {
+    my ($store_name, $items, $player_stats_ref) = @_;
+
+    print "\nWelcome to $store_name!\n";
+    print "Available items:\n";
+    my $i = 1;
+    foreach my $item (@$items) {
+        print "  $i. $item->{name} (\$ $item->{cost})\n";
+        $i++;
+    }
+    print "  $i. Exit Store\n";
+
+    print "\nEnter your choice: ";
+    my $choice = <STDIN>;
+    chomp($choice);
+
+    if ($choice >= 1 && $choice <= @$items) {
+        my $item = $items->[$choice - 1];
+        if ($player_stats_ref->{money} >= $item->{cost}) {
+            $player_stats_ref->{money} -= $item->{cost};
+            foreach my $key (keys %{$item->{effect}}) {
+                $player_stats_ref->{$key} += $item->{effect}->{$key};
+            }
+            print "You purchased $item->{name} for \$ $item->{cost}.\n";
+        } else {
+            print "You don\'t have enough money to buy $item->{name}.\n";
+        }
+    } else {
+        print "Exiting $store_name.\n";
+    }
+}
+
+# Gets player input safely
+sub get_player_input {
+    my $input = <STDIN>;
+    chomp($input);
+    return uc($input);
+}
+
+# Displays the admin console menu
+sub display_admin_console {
+    my ($bbs_name, $player_stats, $current_time) = @_;
+    my $formatted_time = POSIX::strftime("%Y-%m-%d %H:%M:%S", localtime($current_time));
+
+    print "===========================================\n";
+    print "*** $bbs_name Admin Console ***\n";
+    print "Date and Time: $formatted_time\n";
+    print "===========================================\n";
+    print " Free Users: $player_stats->{free_users}     |  Bank acct: \$ $player_stats->{money}\n";
+    print " Paying Users: $player_stats->{paying_users}   |  Employees: $player_stats->{employees}\n";
+    print "===========================================\n\n";
     print "    W - Work on your BBS to attract users and resources.\n";
     print "    M - Mall of the Future.\n";
     print "    V - Scan for and remove viruses from your system.\n";
@@ -22,121 +124,40 @@ sub display_menu {
     print "    S - Save Game.\n";
     print "    C - Clear Screen.\n";
     print "    Q - Quit the game.\n";
+    print "\n===========================================\n\n";
+    print "Command: ";
 }
 
-# Get input from the player
-sub get_player_input {
-    print "Enter your command: ";
-    my $input = <STDIN>;
-    chomp($input);
-    return uc($input);
-}
-
-# Display the "Mall of the Future" menu
-sub display_store {
-    print "\nWelcome to the Mall of the Future!\n";
-    print "Here are the items available for purchase:\n";
-    
-    my $index = 1;
-    foreach my $item (@store_items) {
-        print "[$index] $item->{name} - \$ $item->{cost}\n";
-        $index++;
-    }
-    print "[C] Cancel\n";
-}
-
-# Handle player purchases
-sub handle_purchase {
-    my ($player_stats_ref) = @_;
-    my %player_stats = %$player_stats_ref;
-
-    display_store();
-
-    print "\nEnter the number of the item you want to purchase: ";
-    my $choice = <STDIN>;
-    chomp($choice);
-
-    if ($choice =~ /^\d+$/ && $choice > 0 && $choice <= scalar @store_items) {
-        my $item = $store_items[$choice - 1];
-
-        if ($player_stats{money} >= $item->{cost}) {
-            $player_stats{money} -= $item->{cost};
-            foreach my $stat (keys %{$item->{impact}}) {
-                $player_stats{$stat} += $item->{impact}{$stat};
-            }
-            print "\nYou purchased $item->{name} for \$ $item->{cost}.\n";
-            Player::add_to_inventory($item->{name});
-        } else {
-            print "\nYou do not have enough money to purchase this item.\n";
-        }
-    } elsif (uc($choice) eq 'C') {
-        print "\nPurchase canceled.\n";
-    } else {
-        print "\nInvalid choice. Returning to the main menu.\n";
-    }
-
-    return \%player_stats;
-}
-
-# Display an event
-sub display_event {
-    my ($event) = @_;
-
-    my $event_description = $event->{description} // 'Unknown event';
-    print "Event: $event_description\n";
-
-    if (exists $event->{impact}) {
-        foreach my $key (keys %{$event->{impact}}) {
-            print "  Impact on $key: $event->{impact}{$key}\n";
-        }
-    }
-}
-
-# Display a general message
-sub display_message {
-    my ($message) = @_;
-    print "$message\n";
-}
-
-# Display unlocked achievements
-sub display_achievements {
-    my (@achievements) = @_;
-
-    if (@achievements) {
-        print "\nCongratulations! You have unlocked the following achievements:\n";
-        foreach my $achievement (@achievements) {
-            print "  - $achievement\n";
-        }
-    }
-}
-
-# Display an error message
-sub display_error {
-    my ($error) = @_;
-    print "Error: $error\n";
-}
-
-# Display end game summary
+# Displays the end game summary
 sub display_end_game {
-    my ($score, $achievements) = @_;
+    my ($money, $achievements) = @_;
+
     print "\n===========================================\n";
     print "Game Over\n";
-    print "Final Score: $score\n";
+    print "Final Score: \$ $money\n";
     print "Achievements Unlocked:\n";
-    foreach my $achievement (@$achievements) {
-        print "  - $achievement\n";
+
+    # Ensure achievements is an array reference
+    if (ref($achievements) eq 'ARRAY' && @$achievements) {
+        foreach my $achievement (@$achievements) {
+            print "  - $achievement\n";
+        }
+    } else {
+        print "  None\n";
     }
+
     print "===========================================\n\n";
 }
 
-# Display reports menu
-sub display_reports_menu {
-    print "\nReports Menu:\n";
-    print "    1 - User Growth Report\n";
-    print "    2 - Satisfaction and Hardware Quality Report\n";
-    print "    3 - Financial Report\n";
-    print "    C - Cancel\n";
-    print "\nEnter your choice: ";
+# Displays reports
+sub display_report {
+    my ($report_type, $report_data) = @_;
+
+    print "\n===========================================\n";
+    print "Report: $report_type\n";
+    print "===========================================\n";
+    print "$report_data\n";
+    print "===========================================\n\n";
 }
 
 1; # Return true for module loading

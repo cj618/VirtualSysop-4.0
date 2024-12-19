@@ -8,6 +8,11 @@ use POSIX qw(strftime);
 # Tell it where the modules live
 use lib './modules';
 
+use strict;
+use warnings;
+use File::Path qw(make_path);
+use POSIX qw(strftime);
+
 # Import modules
 use Data;
 use Event;
@@ -78,30 +83,13 @@ while ($game_running) {
 
     # Capture current player stats for history tracking
     my %player_stats = Player::get_stats();
+    %player_stats = Score::recalculate_metrics(%player_stats);
+
     my $current_time = time;
     push @stats_history, { %player_stats, timestamp => $current_time };
 
     # Display BBS admin console header
-    my $formatted_time = strftime("%Y-%m-%d %H:%M:%S", localtime($current_time));
-    my $current_score = Score::calculate_score(%player_stats);
-
-    print "===========================================\n";
-    print "*** $bbs_name Admin Console ***\n";
-    print "Date and Time: $formatted_time\n";
-    print "===========================================\n";
-    print "Commands:\n";
-    print "    W - Work on your BBS to attract users and resources.\n";
-    print "    M - Mall of the Future.\n";
-    print "    V - Scan for and remove viruses from your system.\n";
-    print "    R - View reports on your progress and score.\n";
-    print "    N - Network with rivals.\n";
-    print "    S - Save Game.\n";
-    print "    C - Clear Screen.\n";
-    print "    Q - Quit the game.\n";
-    print "\n===========================================\n";
-    print "Current Score: $current_score   ||  Remaining Actions: $player_stats{actions_remaining}\n";
-    print "===========================================\n";
-    print "\nCommand: ";
+    UI::display_admin_console($bbs_name, \%player_stats, $current_time);
 
     # Get player command
     my $command = UI::get_player_input();
@@ -121,7 +109,7 @@ while ($game_running) {
     } elsif ($command eq 'M') {
         # Mall of the Future command
         my $updated_stats = UI::handle_purchase(\%player_stats);
-        %player_stats = %$updated_stats;
+        Player::update_stats(%$updated_stats);
     } elsif ($command eq 'V') {
         # Virus scan command
         my @events = Event::trigger_events();
@@ -196,8 +184,7 @@ while ($game_running) {
         # Quit command
         $game_running = 0;
         my %stats = Player::get_stats();
-        my $score = Score::calculate_score(%stats);
-        UI::display_end_game($score, $stats{achievements});
+        UI::display_end_game($stats{money}, $stats{achievements});
     } else {
         # Invalid command
         UI::display_error("Invalid command. Please try again.");

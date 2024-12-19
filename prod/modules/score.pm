@@ -3,65 +3,37 @@ package Score;
 use strict;
 use warnings;
 
-# Recalculate success metrics based on updated game dynamics
+# Recalculate metrics dynamically based on player stats
 sub recalculate_metrics {
     my (%player_stats) = @_;
 
-    # Calculate money based on paid users
-    my $income_from_users = $player_stats{paying_users} * 10; # Each paying user generates $10
-    my $expenses = $player_stats{expenses} || 0; # Track expenses dynamically
-    
-    # Update money
-    $player_stats{money} += $income_from_users - $expenses;
+    # Adjust metrics based on current player stats
+    $player_stats{user_growth} = ($player_stats{free_users} * 0.5) + ($player_stats{paying_users} * 1.5);
+    $player_stats{satisfaction} += ($player_stats{inventory}->{satisfaction_boost} // 0);
+    $player_stats{money} -= $player_stats{expenses};
 
-    # Ensure money doesn't go negative
-    $player_stats{money} = 0 if $player_stats{money} < 0;
-
-    # Free users increase satisfaction
-    $player_stats{satisfaction} += int($player_stats{free_users} / 50);
+    # Cap satisfaction at 100
     $player_stats{satisfaction} = 100 if $player_stats{satisfaction} > 100;
 
     return %player_stats;
 }
 
-# Display key success metrics
-sub display_metrics {
+# Add achievements logic for score-based milestones
+sub check_achievements {
     my (%player_stats) = @_;
+    my @new_achievements;
 
-    print "===========================================\n";
-    print "Success Metrics:\n";
-    print "  Free Users: $player_stats{free_users}\n";
-    print "  Paying Users: $player_stats{paying_users}\n";
-    print "  Money: \$ $player_stats{money}\n";
-    print "  Employees: $player_stats{employees}\n";
-    print "===========================================\n";
-}
-
-# Deduct expenses for purchases or events
-sub deduct_expenses {
-    my ($amount, %player_stats) = @_;
-
-    $player_stats{expenses} += $amount;
-    print "\$ $amount has been deducted for expenses.\n";
-
-    return %player_stats;
-}
-
-# Update metrics after each action
-sub update_after_action {
-    my ($action_type, %player_stats) = @_;
-
-    if ($action_type eq 'work') {
-        $player_stats{free_users} += int(rand(20));
-        $player_stats{paying_users} += int(rand(5));
-    } elsif ($action_type eq 'virus_scan') {
-        $player_stats{free_users} -= int(rand(10));
-        $player_stats{satisfaction} += 2;
-    } elsif ($action_type eq 'network') {
-        $player_stats{free_users} += int(rand(15));
+    if ($player_stats{money} >= 5000 && !grep { $_ eq "Rich BBS Owner" } @{$player_stats{achievements}}) {
+        push @new_achievements, "Rich BBS Owner";
+    }
+    if ($player_stats{paying_users} >= 100 && !grep { $_ eq "Top Tier Subscription" } @{$player_stats{achievements}}) {
+        push @new_achievements, "Top Tier Subscription";
+    }
+    if ($player_stats{satisfaction} >= 90 && !grep { $_ eq "User Favorite" } @{$player_stats{achievements}}) {
+        push @new_achievements, "User Favorite";
     }
 
-    return %player_stats;
+    return @new_achievements;
 }
 
 1; # Return true for module loading
