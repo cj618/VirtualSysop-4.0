@@ -98,6 +98,18 @@ sub display_message {
     print "$message\n";
 }
 
+# Display unlocked achievements
+sub display_achievements {
+    my (@achievements) = @_;
+
+    if (@achievements) {
+        print "\nCongratulations! You have unlocked the following achievements:\n";
+        foreach my $achievement (@achievements) {
+            print "  - $achievement\n";
+        }
+    }
+}
+
 # Display an error message
 sub display_error {
     my ($error) = @_;
