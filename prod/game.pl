@@ -15,6 +15,7 @@ use Player;
 use UI;
 use Score;
 use Rival;
+use Reports;
 
 # Constants
 my $USER_DIR = "users";
@@ -60,6 +61,9 @@ Data::load_file('data/msgsv.dat');
 Data::load_file('data/text.dat');
 Data::load_file('data/virus.dat');
 
+# Track player stats history for reports
+my @stats_history;
+
 # Game loop state
 my $game_running = 1;
 my $screen_cleared = 0; # Track whether the screen has been cleared
@@ -72,14 +76,18 @@ while ($game_running) {
         $screen_cleared = 1;
     }
 
-    # Display BBS admin console header
-    my $current_time = strftime("%Y-%m-%d %H:%M:%S", localtime);
+    # Capture current player stats for history tracking
     my %player_stats = Player::get_stats();
+    my $current_time = time;
+    push @stats_history, { %player_stats, timestamp => $current_time };
+
+    # Display BBS admin console header
+    my $formatted_time = strftime("%Y-%m-%d %H:%M:%S", localtime($current_time));
     my $current_score = Score::calculate_score(%player_stats);
 
     print "===========================================\n";
     print "*** $bbs_name Admin Console ***\n";
-    print "Date and Time: $current_time\n";
+    print "Date and Time: $formatted_time\n";
     print "===========================================\n";
     print "Commands:\n";
     print "    W - Work on your BBS to attract users and resources.\n";
@@ -109,17 +117,6 @@ while ($game_running) {
         # Mall of the Future command
         my $updated_stats = UI::handle_purchase(\%player_stats);
         %player_stats = %$updated_stats;
-
-        # Add event for the purchase
-        foreach my $item (keys %{$updated_stats->{inventory}}) {
-            if ($item eq 'Hardware Upgrade') {
-                Event::add_event({ description => 'Hardware improvements boosted satisfaction!', impact => { satisfaction => 2 } });
-            } elsif ($item eq 'Antivirus License') {
-                Event::add_event({ description => 'Antivirus reduced system crashes.', impact => { virus_protection => 1 } });
-            } elsif ($item eq 'User Engagement Tool') {
-                Event::add_event({ description => 'Engagement tool attracted more users!', impact => { free_users => 10 } });
-            }
-        }
     } elsif ($command eq 'V') {
         # Virus scan command
         my @events = Event::trigger_events();
@@ -128,10 +125,27 @@ while ($game_running) {
         }
         Player::deduct_actions(8); # Deduct 8 actions for virus scanning
     } elsif ($command eq 'R') {
-        # Report command
-        my %stats = Player::get_stats();
-        my $score = Score::calculate_score(%stats);
-        Score::display_score($score, %stats);
+        # Reports command
+        print "\nChoose a report to view:\n";
+        print "    1 - User Growth\n";
+        print "    2 - Satisfaction and Hardware Quality\n";
+        print "    3 - Financial Report\n";
+        print "    C - Cancel\n";
+        print "\nEnter your choice: ";
+        my $report_choice = <STDIN>;
+        chomp($report_choice);
+
+        if ($report_choice eq '1') {
+            Reports::generate_user_growth_report(\@stats_history);
+        } elsif ($report_choice eq '2') {
+            Reports::generate_satisfaction_report(\@stats_history);
+        } elsif ($report_choice eq '3') {
+            Reports::generate_financial_report(\@stats_history);
+        } elsif (uc($report_choice) eq 'C') {
+            print "Returning to main menu.\n";
+        } else {
+            print "Invalid choice. Returning to main menu.\n";
+        }
     } elsif ($command eq 'N') {
         # Network command
         Rival::display_rivals();

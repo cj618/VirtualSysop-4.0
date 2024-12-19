@@ -18,7 +18,7 @@ sub display_menu {
     print "    M - Mall of the Future.\n";
     print "    V - Scan for and remove viruses from your system.\n";
     print "    R - View reports on your progress and score.\n";
-    print "    N - Network (coming soon).\n";
+    print "    N - Network with rivals.\n";
     print "    S - Save Game.\n";
     print "    C - Clear Screen.\n";
     print "    Q - Quit the game.\n";
@@ -127,6 +127,16 @@ sub display_end_game {
         print "  - $achievement\n";
     }
     print "===========================================\n\n";
+}
+
+# Display reports menu
+sub display_reports_menu {
+    print "\nReports Menu:\n";
+    print "    1 - User Growth Report\n";
+    print "    2 - Satisfaction and Hardware Quality Report\n";
+    print "    3 - Financial Report\n";
+    print "    C - Cancel\n";
+    print "\nEnter your choice: ";
 }
 
 1; # Return true for module loading
