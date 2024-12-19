@@ -2,59 +2,69 @@ package UI;
 
 use strict;
 use warnings;
+use Data::Dumper; # For debugging purposes
 
 # Display the main menu
 sub display_menu {
-    print "\n================ Main Menu ================\n";
-    print "[W] Work\n";
-    print "[M] Check Mail\n";
-    print "[V] Virus Scan\n";
-    print "[S] Store\n";
-    print "[R] Report\n";
-    print "[C] Charge Users\n";
-    print "[Q] Quit\n";
-    print "========================================\n";
-    print "Enter your choice: ";
+    print "Commands:\n";
+    print "    W - Work on your BBS to attract users and resources.\n";
+    print "    M - Mall of the Future (coming soon).\n";
+    print "    V - Scan for and remove viruses from your system.\n";
+    print "    R - View reports on your progress and score.\n";
+    print "    N - Network (coming soon).\n";
+    print "    S - Save Game.\n";
+    print "    C - Clear Screen.\n";
+    print "    Q - Quit the game.\n";
 }
 
-# Get player input
+# Get input from the player
 sub get_player_input {
+    print "Enter your command: ";
     my $input = <STDIN>;
     chomp($input);
-    return uc($input);  # Convert to uppercase for uniformity
+    return uc($input);
 }
 
-# Display a message to the player
+# Display an event
+sub display_event {
+    my ($event) = @_;
+    
+    # Debugging output to verify the event structure
+    print Dumper($event) if !$event->{description};
+
+    my $event_description = $event->{description} // 'Unknown event';
+    print "Event: $event_description\n";
+
+    if (exists $event->{impact}) {
+        foreach my $key (keys %{$event->{impact}}) {
+            print "  Impact on $key: $event->{impact}{$key}\n";
+        }
+    }
+}
+
+# Display a general message
 sub display_message {
     my ($message) = @_;
-    print "\n$message\n";
+    print "$message\n";
 }
 
 # Display an error message
 sub display_error {
     my ($error) = @_;
-    print "\n[ERROR]: $error\n";
+    print "Error: $error\n";
 }
 
-# Display a triggered event
-sub display_event {
-    my ($event) = @_;
-    print "\n*** Event Triggered ***\n";
-    print "Type       : $event->{type}\n";
-    print "Description: $event->{description}\n";
-    print "Action     : $event->{action}\n";
-    print "Value      : $event->{value}\n";
-    print "*************************\n";
-}
-
-# Display the end-game screen
+# Display end game summary
 sub display_end_game {
-    my ($final_score, $achievements) = @_;
-    print "\n================ End Game =================\n";
-    print "Final Score     : $final_score\n";
-    print "Achievements    : ", join(", ", @$achievements), "\n";
-    print "=========================================\n";
-    print "Thank you for playing Virtual SysOp!\n";
+    my ($score, $achievements) = @_;
+    print "\n===========================================\n";
+    print "Game Over\n";
+    print "Final Score: $score\n";
+    print "Achievements Unlocked:\n";
+    foreach my $achievement (@$achievements) {
+        print "  - $achievement\n";
+    }
+    print "===========================================\n\n";
 }
 
 1; # Return true for module loading
