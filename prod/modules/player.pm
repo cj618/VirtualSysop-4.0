@@ -2,9 +2,9 @@ package Player;
 
 use strict;
 use warnings;
+use Storable qw(nfreeze thaw);
 use Crypt::Blowfish;
 use MIME::Base64;
-use Storable qw(nfreeze thaw);
 
 # Player stats
 my %player = (
@@ -16,6 +16,7 @@ my %player = (
     money             => 500, # Starting currency
     achievements      => [],  # List of achievements
     problems_resolved => 0,   # Tracks resolved problems
+    inventory         => {},  # Tracks purchased items
 );
 
 # Blowfish encryption key (must be 8 bytes)
@@ -32,6 +33,7 @@ sub initialize {
         money             => 500,
         achievements      => [],
         problems_resolved => 0,
+        inventory         => {},
     );
 }
 
@@ -70,18 +72,16 @@ sub deduct_actions {
     }
 }
 
-# Display player stats (ASCII output)
-sub display_stats {
-    print "================ Player Stats ================\n";
-    print "Free Users       : $player{free_users}\n";
-    print "Paying Users     : $player{paying_users}\n";
-    print "Satisfaction     : $player{satisfaction}%\n";
-    print "Hardware Quality : $player{hardware_quality}/10\n";
-    print "Actions Remaining: $player{actions_remaining}\n";
-    print "Money            : \$ $player{money}\n";
-    print "Achievements     : ", join(", ", @{$player{achievements}}), "\n";
-    print "Problems Resolved: $player{problems_resolved}\n";
-    print "=============================================\n";
+# Add an item to the inventory
+sub add_to_inventory {
+    my ($item, $quantity) = @_;
+    $quantity ||= 1; # Default quantity is 1
+    $player{inventory}{$item} += $quantity;
+}
+
+# Get inventory
+sub get_inventory {
+    return %{$player{inventory}};
 }
 
 # Save player data to a file
@@ -101,12 +101,10 @@ sub save_game {
     }
     
     # Encode as Base64 and save to file
-    open my $fh, '>', $filename or die "Can't find saved game!\n";
+    open my $fh, '>', $filename or die "Cannot open file: $filename\n";
     print $fh encode_base64($encrypted, '');
     close $fh;
-
-# 	Notification already in game.pl file - but you could do it here.
-#    print "Game saved successfully to $filename\n";
+    print "Game saved successfully to $filename\n";
 }
 
 # Load player data from a file
@@ -115,7 +113,7 @@ sub load_game {
     my $cipher = Crypt::Blowfish->new($blowfish_key);
     
     # Read and decode the file
-    open my $fh, '<', $filename or die "Can't open saved game!\n";
+    open my $fh, '<', $filename or die "Cannot open file: $filename\n";
     my $encoded = do { local $/; <$fh> };
     close $fh;
     my $encrypted = decode_base64($encoded);
@@ -128,7 +126,7 @@ sub load_game {
     
     # Deserialize and load player data
     %player = %{ thaw($decrypted) };
-    print "Game loaded successfully. Welcome back!, SysOp!\n";
+    print "Game loaded successfully from $filename\n";
 }
 
 1; # Return true for module loading

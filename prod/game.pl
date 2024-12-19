@@ -82,7 +82,7 @@ while ($game_running) {
     print "===========================================\n";
     print "Commands:\n";
     print "    W - Work on your BBS to attract users and resources.\n";
-    print "    M - Mall of the Future (coming soon).\n";
+    print "    M - Mall of the Future.\n";
     print "    V - Scan for and remove viruses from your system.\n";
     print "    R - View reports on your progress and score.\n";
     print "    N - Network (coming soon).\n";
@@ -105,8 +105,20 @@ while ($game_running) {
         }
         Player::deduct_actions(10); # Deduct 10 actions for working
     } elsif ($command eq 'M') {
-        # Mall of the Future command (placeholder)
-        UI::display_message("Mall of the Future functionality is under development.");
+        # Mall of the Future command
+        my $updated_stats = UI::handle_purchase(\%player_stats);
+        %player_stats = %$updated_stats;
+
+        # Add event for the purchase
+        foreach my $item (keys %{$updated_stats->{inventory}}) {
+            if ($item eq 'Hardware Upgrade') {
+                Event::add_event({ description => 'Hardware improvements boosted satisfaction!', impact => { satisfaction => 2 } });
+            } elsif ($item eq 'Antivirus License') {
+                Event::add_event({ description => 'Antivirus reduced system crashes.', impact => { virus_protection => 1 } });
+            } elsif ($item eq 'User Engagement Tool') {
+                Event::add_event({ description => 'Engagement tool attracted more users!', impact => { free_users => 10 } });
+            }
+        }
     } elsif ($command eq 'V') {
         # Virus scan command
         my @events = Event::trigger_events();

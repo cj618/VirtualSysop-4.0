@@ -2,77 +2,52 @@ package Event;
 
 use strict;
 use warnings;
-use Data;
+use List::Util qw(shuffle);
 
-# Hash to store event probabilities and handlers
-my %event_registry = (
-    "work_action" => {
-        probability => 0.5,  # 50% chance
-        handler     => \&handle_work_event,
-    },
-    "problem_mail" => {
-        probability => 0.2,  # 20% chance
-        handler     => \&handle_problem_mail,
-    },
-    "virus_event" => {
-        probability => 0.1,  # 10% chance
-        handler     => \&handle_virus_event,
-    },
-    "positive_outcome" => {
-        probability => 0.2,  # 20% chance
-        handler     => \&handle_positive_outcome,
-    },
+# Event pool (define various events)
+my @events = (
+    { description => 'Your system experienced a small crash.', impact => { satisfaction => -5 } },
+    { description => 'A popular user promoted your BBS!', impact => { free_users => 20 } },
+    { description => 'A competitor launched a new feature.', impact => { satisfaction => -3 } },
+    { description => 'Your antivirus caught a potential threat.', impact => { virus_protection => 1 } },
 );
 
-# Function to trigger events based on probabilities
+# Rare events
+my @rare_events = (
+    { description => 'A celebrity endorsed your BBS!', impact => { free_users => 50, paying_users => 10 } },
+    { description => 'Major hardware failure!', impact => { hardware_quality => -5, satisfaction => -10 } },
+    { description => 'A viral post brought in a surge of users!', impact => { free_users => 100 } },
+);
+
+# Trigger random events
 sub trigger_events {
     my @triggered_events;
 
-    foreach my $event_type (keys %event_registry) {
-        if (rand() < $event_registry{$event_type}{probability}) {
-            push @triggered_events, $event_registry{$event_type}{handler}->();
-        }
+    # Randomly add a common event
+    if (rand() < 0.8) { # 80% chance for a common event
+        my $event = (shuffle @events)[0];
+        push @triggered_events, $event;
     }
 
-    return @triggered_events;  # Return descriptions of triggered events
+    # Randomly add a rare event
+    if (rand() < 0.2) { # 20% chance for a rare event
+        my $rare_event = (shuffle @rare_events)[0];
+        push @triggered_events, $rare_event;
+    }
+
+    return @triggered_events;
 }
 
-# Handlers for different event types
-
-sub handle_work_event {
-    my $events = Data::get_data('msgsa');
-    return _random_event($events, "Work Event");
+# Add new events dynamically (for Mall of the Future purchases)
+sub add_event {
+    my ($event) = @_;
+    push @events, $event;
 }
 
-sub handle_problem_mail {
-    my $events = Data::get_data('msgsr');
-    return _random_event($events, "Problem Mail");
-}
-
-sub handle_virus_event {
-    my $events = Data::get_data('msgsv');
-    return _random_event($events, "Virus Event");
-}
-
-sub handle_positive_outcome {
-    my $events = Data::get_data('msgsa');
-    return _random_event($events, "Positive Outcome");
-}
-
-# Helper function to pick a random event from a list
-sub _random_event {
-    my ($events, $event_type) = @_;
-    
-    return "$event_type: No data available" unless $events && @$events;
-
-    my $event = $events->[int(rand(@$events))];
-    
-    return {
-        type => $event_type,
-        description => $event->{text},
-        action => $event->{action},
-        value => $event->{value},
-    };
+# Add a new rare event dynamically
+sub add_rare_event {
+    my ($rare_event) = @_;
+    push @rare_events, $rare_event;
 }
 
 1; # Return true for module loading
