@@ -8,7 +8,6 @@ use POSIX qw(strftime);
 # Tell it where the modules live
 use lib './modules';
 
-
 # Import modules
 use Data;
 use Event;
@@ -78,7 +77,14 @@ while ($game_running) {
     print "===========================================\n";
 
     # Display main menu
-    UI::display_menu();
+    print "Commands:\n";
+    print "    W - Work on your BBS to attract users and resources.\n";
+    print "    M - Mall of the Future (coming soon).\n";
+    print "    V - Scan for and remove viruses from your system.\n";
+    print "    R - View reports on your progress and score.\n";
+    print "    N - Network (coming soon).\n";
+    print "    S - Save Game.\n";
+    print "    Q - Quit the game.\n";
     
     # Get player command
     my $command = UI::get_player_input();
@@ -91,12 +97,8 @@ while ($game_running) {
         }
         Player::deduct_actions(10); # Deduct 10 actions for working
     } elsif ($command eq 'M') {
-        # Check mail command
-        my @events = Event::trigger_events();
-        foreach my $event (@events) {
-            UI::display_event($event);
-        }
-        Player::deduct_actions(5); # Deduct 5 actions for checking mail
+        # Mall of the Future command (placeholder)
+        UI::display_message("Mall of the Future functionality is under development.");
     } elsif ($command eq 'V') {
         # Virus scan command
         my @events = Event::trigger_events();
@@ -104,22 +106,19 @@ while ($game_running) {
             UI::display_event($event);
         }
         Player::deduct_actions(8); # Deduct 8 actions for virus scanning
-    } elsif ($command eq 'S') {
-        # Store command (placeholder)
-        UI::display_message("Store functionality is under development.");
     } elsif ($command eq 'R') {
         # Report command
         my %stats = Player::get_stats();
         my $score = Score::calculate_score(%stats);
         Score::display_score($score, %stats);
-    } elsif ($command eq 'C') {
-        # Charge users command (placeholder)
-        UI::display_message("Charge users functionality is under development.");
-    } elsif ($command eq 'SAVE') {
+    } elsif ($command eq 'N') {
+        # Network command (placeholder)
+        UI::display_message("Network functionality is under development.");
+    } elsif ($command eq 'S') {
         # Save game command
         my $save_file = "$USER_DIR/$bbs_name.vso";
         Player::save_game($save_file);
-        print "Game saved successfully\n";
+        print "Game saved successfully to $save_file\n";
     } elsif ($command eq 'Q') {
         # Quit command
         $game_running = 0;
