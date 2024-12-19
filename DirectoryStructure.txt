@@ -1,0 +1,17 @@
+/virtual_sysop
+  ├── game.pl                # Main game script
+  ├── modules/
+  │   ├── Data.pm            # Handles data parsing and loading
+  │   ├── Event.pm           # Manages events
+  │   ├── Player.pm          # Tracks player progress
+  │   ├── UI.pm              # Handles user interface and ASCII art
+  │   ├── Score.pm           # Implements scoring system
+  ├── data/
+  │   ├── msgsa.dat
+  │   ├── msgsr.dat
+  │   ├── msgsv.dat
+  │   ├── text.dat
+  │   ├── virus.dat
+  └── assets/
+      ├── mainmenu.ans       # ASCII graphics for main menu
+      ├── themes/            # Customizable themes
