@@ -36,13 +36,13 @@ sub handle_purchase {
 
     if ($choice == 1) {
         _visit_store("Sears", [
-            { name => "Server Rack", cost => 500, effect => { free_users => 10, satisfaction => 2 } },
-            { name => "Desk Setup", cost => 200, effect => { employees => 1 } }
+            { name => "New Hard Disk", cost => 500, effect => { free_users => 10, satisfaction => 2 } },
+            { name => "New Desk and Chair", cost => 250, effect => { employees => 1 } }
         ], $player_stats_ref);
     } elsif ($choice == 2) {
         _visit_store("Best Buy", [
             { name => "Antivirus Software", cost => 300, effect => { satisfaction => 5, virus_protection => 10 } },
-            { name => "Monitor", cost => 150, effect => { satisfaction => 3 } }
+            { name => "Door Games", cost => 150, effect => { satisfaction => 3 } }
         ], $player_stats_ref);
     } elsif ($choice == 3) {
         _visit_store("CompUSA", [
@@ -51,13 +51,17 @@ sub handle_purchase {
         ], $player_stats_ref);
     } elsif ($choice == 4) {
         _visit_store("News Corporation", [
-            { name => "Radio Ad", cost => 1000, effect => { free_users => 30, paying_users => 10 } },
+        	{ name => "Newspaper Ad", cost => 1000, effect => { free_users => 30, paying_users => 30 } },
+            { name => "Radio Ad", cost => 800, effect => { free_users => 30, paying_users => 10 } },
             { name => "Flyers", cost => 300, effect => { free_users => 10 } }
         ], $player_stats_ref);
     } elsif ($choice == 5) {
         _visit_store("7-Eleven", [
-            { name => "Soda", cost => 5, effect => { actions_remaining => 5, daily_action_limit => 5 } },
-            { name => "Snacks", cost => 10, effect => { actions_remaining => 10, daily_action_limit => 10 } }
+            { name => "Jolt Cola - All the sugar and twice the caffeine", cost => 5, effect => { actions_remaining => 10, daily_action_limit => 10 } },
+        	{ name => "Pepsi - The Taste of a New Generation", cost => 4, effect => { actions_remaining => 5, daily_action_limit => 5 } },
+			{ name => "Mountain Dew - Do the Dew", cost => 4, effect => { actions_remaining => 5, daily_action_limit => 5 } },
+            { name => "Pringles - Once you pop...", cost => 10, effect => { actions_remaining => 10, daily_action_limit => 10 } },
+            { name => "Nachos", cost => 10, effect => { actions_remaining => 10, daily_action_limit => 10 } }
         ], $player_stats_ref);
     } else {
         print "Exiting the mall.\n";

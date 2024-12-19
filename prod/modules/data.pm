@@ -108,7 +108,7 @@ sub _parse_list_file {
 # Randomly trigger less frequent hardware upgrades
 sub random_hardware_upgrade {
     my $probability = int(rand(100));
-    return $probability < 10;  # 10% chance for upgrade event
+    return $probability < 5;  # 5% chance for upgrade event
 }
 
 1; # Return true for module loading

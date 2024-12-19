@@ -10,7 +10,7 @@ my %player_data = (
     free_users        => 0,
     paying_users      => 0,
     money             => 1000,  # Initial money for demonstration purposes
-    employees         => 1,
+    employees         => 0,
     satisfaction      => 50,
     expenses          => 0,
     actions_remaining => 100,
@@ -27,7 +27,7 @@ sub initialize {
         free_users        => 0,
         paying_users      => 0,
         money             => 1000,
-        employees         => 1,
+        employees         => 0,
         satisfaction      => 50,
         expenses          => 0,
         actions_remaining => 100,
