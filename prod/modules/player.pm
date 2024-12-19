@@ -101,10 +101,12 @@ sub save_game {
     }
     
     # Encode as Base64 and save to file
-    open my $fh, '>', $filename or die "Cannot open file: $filename\n";
+    open my $fh, '>', $filename or die "Can't find saved game!\n";
     print $fh encode_base64($encrypted, '');
     close $fh;
-    print "Game saved successfully to $filename\n";
+
+# 	Notification already in game.pl file - but you could do it here.
+#    print "Game saved successfully to $filename\n";
 }
 
 # Load player data from a file
@@ -113,7 +115,7 @@ sub load_game {
     my $cipher = Crypt::Blowfish->new($blowfish_key);
     
     # Read and decode the file
-    open my $fh, '<', $filename or die "Cannot open file: $filename\n";
+    open my $fh, '<', $filename or die "Can't open saved game!\n";
     my $encoded = do { local $/; <$fh> };
     close $fh;
     my $encrypted = decode_base64($encoded);
@@ -126,7 +128,7 @@ sub load_game {
     
     # Deserialize and load player data
     %player = %{ thaw($decrypted) };
-    print "Game loaded successfully from $filename\n";
+    print "Game loaded successfully. Welcome back!, SysOp!\n";
 }
 
 1; # Return true for module loading

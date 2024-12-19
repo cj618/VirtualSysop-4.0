@@ -119,7 +119,7 @@ while ($game_running) {
         # Save game command
         my $save_file = "$USER_DIR/$bbs_name.vso";
         Player::save_game($save_file);
-        print "Game saved successfully to $save_file\n";
+        print "Game saved successfully\n";
     } elsif ($command eq 'Q') {
         # Quit command
         $game_running = 0;
