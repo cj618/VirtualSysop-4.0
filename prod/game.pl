@@ -70,10 +70,10 @@ while ($game_running) {
     my $current_score = Score::calculate_score(%player_stats);
 
     clear_screen();
-    print "===========================================\n";
+    print "===============================================================\n";
     print "*** $bbs_name Admin Console ***\n";
     print "Date and Time: $current_time\n";
-    print "===========================================\n";
+    print "===============================================================\n";
     print "Commands:\n";
     print "    W - Work on your BBS to attract users and resources.\n";
     print "    M - Mall of the Future (coming soon).\n";
@@ -82,9 +82,9 @@ while ($game_running) {
     print "    N - Network (coming soon).\n";
     print "    S - Save Game.\n";
     print "    Q - Quit the game.\n";
-    print "\n===========================================\n";
+    print "\n===============================================================\n";
     print "Current Score: $current_score   ||  Remaining Actions: $player_stats{actions_remaining}\n";
-    print "===========================================\n";
+    print "===============================================================\n";
     print "\nCommand: ";
 
     # Get player command
