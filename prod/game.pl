@@ -92,7 +92,6 @@ while ($game_running) {
     print "\n===========================================\n";
     print "Current Score: $current_score   ||  Remaining Actions: $player_stats{actions_remaining}\n";
     print "===========================================\n";
-    print "\nCommand: ";
 
     # Get player command
     my $command = UI::get_player_input();
