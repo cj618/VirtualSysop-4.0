@@ -2,6 +2,9 @@ package Player;
 
 use strict;
 use warnings;
+use Crypt::Blowfish;
+use MIME::Base64;
+use Storable qw(nfreeze thaw);
 
 # Player stats
 my %player = (
@@ -12,8 +15,11 @@ my %player = (
     actions_remaining => 100, # Actions per day
     money             => 500, # Starting currency
     achievements      => [],  # List of achievements
-    problems_resolved => 0,   # Initialize to avoid warnings
+    problems_resolved => 0,   # Tracks resolved problems
 );
+
+# Blowfish encryption key (must be 8 bytes)
+my $blowfish_key = 'BBSGame!';
 
 # Initialize the player profile
 sub initialize {
@@ -25,7 +31,7 @@ sub initialize {
         actions_remaining => 100,
         money             => 500,
         achievements      => [],
-        problems_resolved => 0,  # Reset this during initialization
+        problems_resolved => 0,
     );
 }
 
@@ -76,6 +82,51 @@ sub display_stats {
     print "Achievements     : ", join(", ", @{$player{achievements}}), "\n";
     print "Problems Resolved: $player{problems_resolved}\n";
     print "=============================================\n";
+}
+
+# Save player data to a file
+sub save_game {
+    my ($filename) = @_;
+    my $cipher = Crypt::Blowfish->new($blowfish_key);
+    
+    # Serialize player data
+    my $serialized = nfreeze(\%player);
+    
+    # Encrypt the data
+    my $encrypted = '';
+    for (my $i = 0; $i < length($serialized); $i += 8) {
+        my $block = substr($serialized, $i, 8);
+        $block .= chr(0) x (8 - length($block)) if length($block) < 8;
+        $encrypted .= $cipher->encrypt($block);
+    }
+    
+    # Encode as Base64 and save to file
+    open my $fh, '>', $filename or die "Cannot open file: $filename\n";
+    print $fh encode_base64($encrypted, '');
+    close $fh;
+    print "Game saved successfully to $filename\n";
+}
+
+# Load player data from a file
+sub load_game {
+    my ($filename) = @_;
+    my $cipher = Crypt::Blowfish->new($blowfish_key);
+    
+    # Read and decode the file
+    open my $fh, '<', $filename or die "Cannot open file: $filename\n";
+    my $encoded = do { local $/; <$fh> };
+    close $fh;
+    my $encrypted = decode_base64($encoded);
+    
+    # Decrypt the data
+    my $decrypted = '';
+    for (my $i = 0; $i < length($encrypted); $i += 8) {
+        $decrypted .= $cipher->decrypt(substr($encrypted, $i, 8));
+    }
+    
+    # Deserialize and load player data
+    %player = %{ thaw($decrypted) };
+    print "Game loaded successfully from $filename\n";
 }
 
 1; # Return true for module loading

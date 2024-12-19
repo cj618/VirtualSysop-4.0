@@ -5,9 +5,6 @@ use warnings;
 use File::Path qw(make_path);
 use POSIX qw(strftime);
 
-# Show it where the modules live
-use lib './modules';
-
 # Import modules
 use Data;
 use Event;
@@ -28,23 +25,28 @@ sub clear_screen {
 
 # Prompt user to set or load BBS name
 clear_screen();
-print "Welcome to Virtual SysOp!\n";
-print "Enter the name of your BBS: ";
-my $bbs_name = <STDIN>;
-chomp($bbs_name);
-my $user_file = "$USER_DIR/$bbs_name.dat";
-
-# Check if user file exists
-if (-e $user_file) {
-    print "Loading existing BBS data for '$bbs_name'...\n";
-    # Future implementation: Load saved game data
+print "Do you want to (L)oad an existing game or start a (N)ew game? ";
+my $choice = <STDIN>;
+chomp($choice);
+my $bbs_name;
+if (uc($choice) eq 'L') {
+    print "Enter the name of the saved game file: ";
+    my $save_file = <STDIN>;
+    chomp($save_file);
+    if (-e "$USER_DIR/$save_file") {
+        Player::load_game("$USER_DIR/$save_file");
+        print "Game loaded successfully!\n";
+        $bbs_name = $save_file;
+    } else {
+        print "Save file not found. Starting a new game instead.\n";
+        Player::initialize();
+    }
 } else {
-    print "Creating a new BBS named '$bbs_name'...\n";
-    # Future implementation: Initialize new game data and save
+    print "Enter the name of your BBS: ";
+    $bbs_name = <STDIN>;
+    chomp($bbs_name);
+    Player::initialize();
 }
-
-# Initialize game state
-Player::initialize();
 
 # Load data files
 Data::load_file('data/msgsa.dat');
@@ -62,7 +64,7 @@ while ($game_running) {
     my $current_time = strftime("%Y-%m-%d %H:%M:%S", localtime);
     my %player_stats = Player::get_stats();
     my $current_score = Score::calculate_score(%player_stats);
-    
+
     print "\n===========================================\n";
     print "$bbs_name Admin Console\n";
     print "Date and Time: $current_time\n";
@@ -108,6 +110,12 @@ while ($game_running) {
     } elsif ($command eq 'C') {
         # Charge users command (placeholder)
         UI::display_message("Charge users functionality is under development.");
+    } elsif ($command eq 'SAVE') {
+        # Save game command
+        print "Enter the filename to save your game: ";
+        my $save_file = <STDIN>;
+        chomp($save_file);
+        Player::save_game("$USER_DIR/$save_file");
     } elsif ($command eq 'Q') {
         # Quit command
         $game_running = 0;
@@ -121,3 +129,4 @@ while ($game_running) {
 }
 
 print "Game over. Goodbye!\n";
+
