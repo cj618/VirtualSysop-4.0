@@ -61,9 +61,14 @@ my $game_running = 1;
 while ($game_running) {
     # Display BBS admin console header
     my $current_time = strftime("%Y-%m-%d %H:%M:%S", localtime);
+    my %player_stats = Player::get_stats();
+    my $current_score = Score::calculate_score(%player_stats);
+    
     print "\n===========================================\n";
     print "$bbs_name Admin Console\n";
     print "Date and Time: $current_time\n";
+    print "Current Score: $current_score\n";
+    print "Remaining Actions: $player_stats{actions_remaining}\n";
     print "===========================================\n";
 
     # Display main menu
