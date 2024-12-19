@@ -2,6 +2,7 @@ package UI;
 
 use strict;
 use warnings;
+use POSIX qw(strftime);
 
 # Displays an error message
 sub display_error {
@@ -34,28 +35,28 @@ sub handle_purchase {
 
     if ($choice == 1) {
         _visit_store("Sears", [
-            { name => "Server Rack", cost => 500, effect => { satisfaction => 5 } },
+            { name => "Server Rack", cost => 500, effect => { free_users => 10, satisfaction => 2 } },
             { name => "Desk Setup", cost => 200, effect => { employees => 1 } }
         ], $player_stats_ref);
     } elsif ($choice == 2) {
         _visit_store("Best Buy", [
-            { name => "Antivirus Software", cost => 300, effect => { virus_protection => 10 } },
+            { name => "Antivirus Software", cost => 300, effect => { satisfaction => 5, virus_protection => 10 } },
             { name => "Monitor", cost => 150, effect => { satisfaction => 3 } }
         ], $player_stats_ref);
     } elsif ($choice == 3) {
         _visit_store("CompUSA", [
-            { name => "Modem", cost => 400, effect => { user_growth => 10 } },
-            { name => "Bandwidth Booster", cost => 700, effect => { user_growth => 15 } }
+            { name => "Modem", cost => 400, effect => { free_users => 15 } },
+            { name => "Bandwidth Booster", cost => 700, effect => { paying_users => 5 } }
         ], $player_stats_ref);
     } elsif ($choice == 4) {
         _visit_store("News Corporation", [
-            { name => "Radio Ad", cost => 1000, effect => { user_growth => 20 } },
-            { name => "Flyers", cost => 300, effect => { user_growth => 5 } }
+            { name => "Radio Ad", cost => 1000, effect => { free_users => 30, paying_users => 10 } },
+            { name => "Flyers", cost => 300, effect => { free_users => 10 } }
         ], $player_stats_ref);
     } elsif ($choice == 5) {
         _visit_store("7-Eleven", [
-            { name => "Soda", cost => 5, effect => { stamina => 5 } },
-            { name => "Snacks", cost => 10, effect => { stamina => 10 } }
+            { name => "Soda", cost => 5, effect => { actions_remaining => 5 } },
+            { name => "Snacks", cost => 10, effect => { actions_remaining => 10 } }
         ], $player_stats_ref);
     } else {
         print "Exiting the mall.\n";
@@ -97,13 +98,6 @@ sub _visit_store {
     }
 }
 
-# Gets player input safely
-sub get_player_input {
-    my $input = <STDIN>;
-    chomp($input);
-    return uc($input);
-}
-
 # Displays the admin console menu
 sub display_admin_console {
     my ($bbs_name, $player_stats, $current_time) = @_;
@@ -128,7 +122,18 @@ sub display_admin_console {
     print "Command: ";
 }
 
-# Displays the end game summary
+# Displays reports based on type
+sub display_report {
+    my ($report_type, $data) = @_;
+
+    print "\n===========================================\n";
+    print "Report: $report_type\n";
+    print "===========================================\n";
+    print "$data\n";
+    print "===========================================\n\n";
+}
+
+# Displays end-game summary
 sub display_end_game {
     my ($money, $achievements) = @_;
 
@@ -137,7 +142,6 @@ sub display_end_game {
     print "Final Score: \$ $money\n";
     print "Achievements Unlocked:\n";
 
-    # Ensure achievements is an array reference
     if (ref($achievements) eq 'ARRAY' && @$achievements) {
         foreach my $achievement (@$achievements) {
             print "  - $achievement\n";
@@ -146,17 +150,6 @@ sub display_end_game {
         print "  None\n";
     }
 
-    print "===========================================\n\n";
-}
-
-# Displays reports
-sub display_report {
-    my ($report_type, $report_data) = @_;
-
-    print "\n===========================================\n";
-    print "Report: $report_type\n";
-    print "===========================================\n";
-    print "$report_data\n";
     print "===========================================\n\n";
 }
 

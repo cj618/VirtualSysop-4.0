@@ -116,4 +116,9 @@ sub get_actions_remaining {
     return $player_data{actions_remaining};
 }
 
+# Get inventory
+sub get_inventory {
+    return $player_data{inventory};
+}
+
 1; # Return true for module loading

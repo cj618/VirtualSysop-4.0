@@ -8,11 +8,6 @@ use POSIX qw(strftime);
 # Tell it where the modules live
 use lib './modules';
 
-use strict;
-use warnings;
-use File::Path qw(make_path);
-use POSIX qw(strftime);
-
 # Import modules
 use Data;
 use Event;
@@ -71,16 +66,9 @@ my @stats_history;
 
 # Game loop state
 my $game_running = 1;
-my $screen_cleared = 0; # Track whether the screen has been cleared
 
 # Main game loop
 while ($game_running) {
-    # Clear the screen only once at the beginning
-    if (!$screen_cleared) {
-        clear_screen();
-        $screen_cleared = 1;
-    }
-
     # Capture current player stats for history tracking
     my %player_stats = Player::get_stats();
     %player_stats = Score::recalculate_metrics(%player_stats);
@@ -105,7 +93,7 @@ while ($game_running) {
             }
         }
         Player::update_stats(%player_stats);
-        Player::deduct_actions(10); # Deduct 10 actions for working
+        Player::deduct_actions(Score::adjust_action_costs(%player_stats));
     } elsif ($command eq 'M') {
         # Mall of the Future command
         my $updated_stats = UI::handle_purchase(\%player_stats);
@@ -128,6 +116,8 @@ while ($game_running) {
         print "    1 - User Growth\n";
         print "    2 - Satisfaction and Hardware Quality\n";
         print "    3 - Financial Report\n";
+        print "    4 - Inventory Report\n";
+        print "    5 - Rival Interactions Report\n";
         print "    C - Cancel\n";
         print "\nEnter your choice: ";
         my $report_choice = <STDIN>;
@@ -139,6 +129,10 @@ while ($game_running) {
             Reports::generate_satisfaction_report(\@stats_history);
         } elsif ($report_choice eq '3') {
             Reports::generate_financial_report(\@stats_history);
+        } elsif ($report_choice eq '4') {
+            Reports::generate_inventory_report(\%player_stats);
+        } elsif ($report_choice eq '5') {
+            Reports::generate_rival_report(\@stats_history);
         } elsif (uc($report_choice) eq 'C') {
             print "Returning to main menu.\n";
         } else {

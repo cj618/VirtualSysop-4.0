@@ -2,55 +2,76 @@ package Event;
 
 use strict;
 use warnings;
-use List::Util qw(shuffle);
 
-# Event pool (define various events)
-my @events = (
-    { description => 'Your system experienced a small crash.', impact => { satisfaction => -5 } },
-    { description => 'A popular user promoted your BBS!', impact => { free_users => 20 } },
-    { description => 'A competitor launched a new feature.', impact => { satisfaction => -3 } },
-    { description => 'Your antivirus caught a potential threat.', impact => { virus_protection => 1 } },
-);
-
-# Rare events
-my @rare_events = (
-    { description => 'A celebrity endorsed your BBS!', impact => { free_users => 50, paying_users => 10 } },
-    { description => 'Major hardware failure!', impact => { hardware_quality => -5, satisfaction => -10 } },
-    { description => 'A viral post brought in a surge of users!', impact => { free_users => 100 } },
-    { description => 'Your BBS was featured on a tech blog!', impact => { free_users => 30, satisfaction => 5 } },
-    { description => 'Hackers attempted to breach your system!', impact => { satisfaction => -15, virus_protection => -1 } },
-    { description => 'You received a grant for system upgrades!', impact => { money => 200, hardware_quality => 3 } },
-);
-
-# Trigger random events
+# Trigger random events based on probabilities
 sub trigger_events {
-    my @triggered_events;
+    my @events;
 
-    # Randomly add a common event
-    if (rand() < 0.8) { # 80% chance for a common event
-        my $event = (shuffle @events)[0];
-        push @triggered_events, $event;
+    # Random event: User surge
+    if (int(rand(100)) < 20) {
+        push @events, {
+            description => "A popular post on your BBS has gone viral!",
+            impact => {
+                free_users => int(rand(50)) + 50,
+                paying_users => int(rand(10)) + 10,
+                satisfaction => 5,
+            },
+        };
     }
 
-    # Randomly add a rare event
-    if (rand() < 0.2) { # 20% chance for a rare event
-        my $rare_event = (shuffle @rare_events)[0];
-        push @triggered_events, $rare_event;
+    # Random event: Virus attack
+    if (int(rand(100)) < 10) {
+        push @events, {
+            description => "A virus has infiltrated your system!",
+            impact => {
+                satisfaction => -10,
+                money => -100,
+            },
+        };
     }
 
-    return @triggered_events;
+    # Random event: System upgrade success
+    if (int(rand(100)) < 15) {
+        push @events, {
+            description => "Your recent system upgrade has boosted performance!",
+            impact => {
+                satisfaction => 10,
+                free_users => int(rand(20)) + 10,
+            },
+        };
+    }
+
+    return @events;
 }
 
-# Add new events dynamically (for Mall of the Future purchases)
-sub add_event {
-    my ($event) = @_;
-    push @events, $event;
-}
+# Network-related events
+sub network_events {
+    my ($interaction_type, $rival_name) = @_;
 
-# Add a new rare event dynamically
-sub add_rare_event {
-    my ($rare_event) = @_;
-    push @rare_events, $rare_event;
+    if ($interaction_type eq 'partnership') {
+        return {
+            description => "Your partnership with $rival_name has brought mutual growth!",
+            impact => {
+                free_users => int(rand(30)) + 20,
+                paying_users => int(rand(10)) + 5,
+                money => int(rand(200)) + 100,
+            },
+        };
+    } elsif ($interaction_type eq 'competition') {
+        return {
+            description => "Your competition with $rival_name has disrupted their user base!",
+            impact => {
+                free_users => int(rand(50)) + 30,
+                satisfaction => -5,
+                money => int(rand(150)) + 50,
+            },
+        };
+    } else {
+        return {
+            description => "No notable events occurred during this interaction.",
+            impact => {},
+        };
+    }
 }
 
 1; # Return true for module loading

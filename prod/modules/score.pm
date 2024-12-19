@@ -7,13 +7,25 @@ use warnings;
 sub recalculate_metrics {
     my (%player_stats) = @_;
 
-    # Adjust metrics based on current player stats
-    $player_stats{user_growth} = ($player_stats{free_users} * 0.5) + ($player_stats{paying_users} * 1.5);
-    $player_stats{satisfaction} += ($player_stats{inventory}->{satisfaction_boost} // 0);
-    $player_stats{money} -= $player_stats{expenses};
+    # Adjust user growth based on upgrades and satisfaction
+    my $growth_multiplier = 1 + ($player_stats{satisfaction} / 100);
+    $player_stats{free_users} += int($player_stats{inventory}->{"Server Rack"} * $growth_multiplier);
+    $player_stats{paying_users} += int($player_stats{inventory}->{"Premium Subscription"} * $growth_multiplier / 2);
+
+    # Adjust satisfaction based on actions and upgrades
+    $player_stats{satisfaction} += $player_stats{inventory}->{"Entertainment System"} // 0;
+    $player_stats{satisfaction} -= $player_stats{actions_remaining} < 10 ? 5 : 0; # Penalize low actions
 
     # Cap satisfaction at 100
     $player_stats{satisfaction} = 100 if $player_stats{satisfaction} > 100;
+    $player_stats{satisfaction} = 0 if $player_stats{satisfaction} < 0;
+
+    # Calculate expenses based on inventory and employees
+    $player_stats{expenses} = ($player_stats{employees} * 50) + ($player_stats{inventory}->{"Server Rack"} * 10);
+    $player_stats{money} -= $player_stats{expenses};
+
+    # Prevent negative money
+    $player_stats{money} = 0 if $player_stats{money} < 0;
 
     return %player_stats;
 }
@@ -34,6 +46,23 @@ sub check_achievements {
     }
 
     return @new_achievements;
+}
+
+# Adjust action costs dynamically
+sub adjust_action_costs {
+    my (%player_stats) = @_;
+
+    my $base_cost = 10; # Default cost for actions like "Work"
+
+    # Reduce action costs based on upgrades
+    if ($player_stats{inventory}->{"Efficiency Suite"}) {
+        $base_cost -= $player_stats{inventory}->{"Efficiency Suite"};
+    }
+
+    # Ensure costs don't go below a minimum value
+    $base_cost = 1 if $base_cost < 1;
+
+    return $base_cost;
 }
 
 1; # Return true for module loading
