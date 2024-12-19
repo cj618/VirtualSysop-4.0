@@ -19,7 +19,7 @@ sub display_menu {
 
 # Get input from the player
 sub get_player_input {
-    print "Enter your command: ";
+#    print "Enter your command: ";
     my $input = <STDIN>;
     chomp($input);
     return uc($input);
