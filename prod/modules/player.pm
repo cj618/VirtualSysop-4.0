@@ -14,13 +14,22 @@ my %player = (
     hardware_quality  => 5,   # Out of 10
     actions_remaining => 100, # Actions per day
     money             => 500, # Starting currency
-    achievements      => [],  # List of achievements
+    achievements      => {},  # Tracks unlocked achievements
     problems_resolved => 0,   # Tracks resolved problems
     inventory         => {},  # Tracks purchased items
 );
 
 # Blowfish encryption key (must be 8 bytes)
 my $blowfish_key = 'BBSGame!';
+
+# Define possible achievements
+my @achievements = (
+    { id => '100_free_users', description => 'Reached 100 free users.', condition => sub { $player{free_users} >= 100 } },
+    { id => '50_paying_users', description => 'Reached 50 paying users.', condition => sub { $player{paying_users} >= 50 } },
+    { id => 'hardware_max', description => 'Hardware quality is 10/10.', condition => sub { $player{hardware_quality} == 10 } },
+    { id => 'high_satisfaction', description => 'Satisfaction score is 90% or more.', condition => sub { $player{satisfaction} >= 90 } },
+    { id => 'wealthy', description => 'Accumulated $1000 or more.', condition => sub { $player{money} >= 1000 } },
+);
 
 # Initialize the player profile
 sub initialize {
@@ -31,7 +40,7 @@ sub initialize {
         hardware_quality  => 5,
         actions_remaining => 100,
         money             => 500,
-        achievements      => [],
+        achievements      => {},
         problems_resolved => 0,
         inventory         => {},
     );
@@ -54,10 +63,21 @@ sub update_stats {
     }
 }
 
-# Add an achievement
-sub add_achievement {
-    my ($achievement) = @_;
-    push @{$player{achievements}}, $achievement;
+# Check and unlock achievements
+sub check_achievements {
+    my @new_achievements;
+    foreach my $achievement (@achievements) {
+        if (!$player{achievements}{$achievement->{id}} && $achievement->{condition}->()) {
+            $player{achievements}{$achievement->{id}} = 1;
+            push @new_achievements, $achievement->{description};
+        }
+    }
+    return @new_achievements;
+}
+
+# Get unlocked achievements
+sub get_achievements {
+    return keys %{$player{achievements}};
 }
 
 # Deduct actions
