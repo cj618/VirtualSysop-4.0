@@ -186,6 +186,32 @@ while ($game_running) {
     } elsif ($command eq 'C') {
         # Clear screen command
         clear_screen();
+    } elsif ($command eq 'U') {
+        # Read User Mail command
+        if (Player::deduct_actions(5)) {
+            my $mail_event = Event::trigger_mail_event();
+            if ($mail_event) {
+                UI::display_event($mail_event);
+                print "\nChoose a response:\n";
+                print "    1 - Approve\n";
+                print "    2 - Reject\n";
+                print "    3 - Ignore\n";
+                print "\nEnter your choice: ";
+                my $response = <STDIN>;
+                chomp($response);
+                if ($response eq '1') {
+                    Player::update_stats(satisfaction => $mail_event->{value});
+                } elsif ($response eq '2') {
+                    Player::update_stats(satisfaction => -5);
+                } else {
+                    print "You chose to ignore the message.\n";
+                }
+            } else {
+                print "No new mail at this time.\n";
+            }
+        } else {
+            UI::display_error("Not enough actions remaining to read mail.");
+        }
     } elsif ($command eq 'Q') {
         # Quit command
         $game_running = 0;

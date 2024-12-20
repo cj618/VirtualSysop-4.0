@@ -51,16 +51,16 @@ sub handle_purchase {
         ], $player_stats_ref);
     } elsif ($choice == 4) {
         _visit_store("News Corporation", [
-        	{ name => "Newspaper Ad", cost => 1000, effect => { free_users => 30, paying_users => 30 } },
+            { name => "Newspaper Ad", cost => 1000, effect => { free_users => 30, paying_users => 30 } },
             { name => "Radio Ad", cost => 800, effect => { free_users => 30, paying_users => 10 } },
             { name => "Flyers", cost => 300, effect => { free_users => 10 } }
         ], $player_stats_ref);
     } elsif ($choice == 5) {
         _visit_store("7-Eleven", [
-            { name => "Jolt Cola - All the sugar and twice the caffeine", cost => 5, effect => { actions_remaining => 10, daily_action_limit => 10 } },
-        	{ name => "Pepsi - The Taste of a New Generation", cost => 4, effect => { actions_remaining => 5, daily_action_limit => 5 } },
-			{ name => "Mountain Dew - Do the Dew", cost => 4, effect => { actions_remaining => 5, daily_action_limit => 5 } },
-            { name => "Pringles - Once you pop...", cost => 10, effect => { actions_remaining => 10, daily_action_limit => 10 } },
+            { name => "Jolt Cola", cost => 5, effect => { actions_remaining => 10, daily_action_limit => 10 } },
+            { name => "Pepsi", cost => 4, effect => { actions_remaining => 5, daily_action_limit => 5 } },
+            { name => "Mountain Dew", cost => 4, effect => { actions_remaining => 5, daily_action_limit => 5 } },
+            { name => "Pringles", cost => 10, effect => { actions_remaining => 10, daily_action_limit => 10 } },
             { name => "Nachos", cost => 10, effect => { actions_remaining => 10, daily_action_limit => 10 } }
         ], $player_stats_ref);
     } else {
@@ -125,6 +125,7 @@ sub display_admin_console {
     print "    V - Scan for and remove viruses from your system.\n";
     print "    R - View reports on your progress and score.\n";
     print "    N - Network with rivals.\n";
+    print "    U - Read user mail.\n";
     print "    S - Save Game.\n";
     print "    C - Clear Screen.\n";
     print "    Q - Quit the game.\n";
