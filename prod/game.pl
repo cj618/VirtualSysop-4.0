@@ -67,6 +67,7 @@ Data::load_file('data/msgsv.dat');
 Data::load_file('data/text.dat');
 Data::load_file('data/virus.dat');
 Data::load_file('data/CPU.DAT');
+Data::load_file('data/modems.dat');
 
 # Track player stats history for reports
 my @stats_history;
@@ -87,7 +88,7 @@ while ($game_running) {
     UI::display_admin_console($bbs_name, \%player_stats, $current_time);
 
     # Check for hardware upgrades
-    Player::upgrade_hardware();
+    Player::check_for_upgrades();
 
     # Get player command
     my $command = UI::get_player_input();
@@ -184,14 +185,6 @@ while ($game_running) {
                 print "Invalid action. Returning to main menu.\n";
             }
         }
-    } elsif ($command eq 'S') {
-        # Save game command
-        my $save_file = "$USER_DIR/$bbs_name.vso";
-        Player::save_game($save_file);
-        print "Game saved successfully to $save_file\n";
-    } elsif ($command eq 'C') {
-        # Clear screen command
-        clear_screen();
     } elsif ($command eq 'U') {
         # Read User Mail command
         if (Player::deduct_actions(5)) {
@@ -218,6 +211,14 @@ while ($game_running) {
         } else {
             UI::display_error("Not enough actions remaining to read mail.");
         }
+    } elsif ($command eq 'S') {
+        # Save game command
+        my $save_file = "$USER_DIR/$bbs_name.vso";
+        Player::save_game($save_file);
+        print "Game saved successfully to $save_file\n";
+    } elsif ($command eq 'C') {
+        # Clear screen command
+        clear_screen();
     } elsif ($command eq 'Q') {
         # Quit command
         $game_running = 0;

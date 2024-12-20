@@ -28,7 +28,8 @@ sub handle_purchase {
     print "  3. CompUSA (BBS Tools)\n";
     print "  4. News Corporation (Marketing)\n";
     print "  5. 7-Eleven (Food & Drinks)\n";
-    print "  6. Exit Mall\n";
+    print "  6. Phone Company (Add/Remove Phone Lines)\n";
+    print "  7. Exit Mall\n";
 
     print "\nEnter your choice: ";
     my $choice = <STDIN>;
@@ -46,7 +47,7 @@ sub handle_purchase {
         ], $player_stats_ref);
     } elsif ($choice == 3) {
         _visit_store("CompUSA", [
-            { name => "Modem", cost => 400, effect => { free_users => 15 } },
+            { name => "Modem", cost => 400, effect => { modem_level => 1 } },
             { name => "Bandwidth Booster", cost => 700, effect => { paying_users => 5 } }
         ], $player_stats_ref);
     } elsif ($choice == 4) {
@@ -62,6 +63,11 @@ sub handle_purchase {
             { name => "Mountain Dew", cost => 4, effect => { actions_remaining => 5, daily_action_limit => 5 } },
             { name => "Pringles", cost => 10, effect => { actions_remaining => 10, daily_action_limit => 10 } },
             { name => "Nachos", cost => 10, effect => { actions_remaining => 10, daily_action_limit => 10 } }
+        ], $player_stats_ref);
+    } elsif ($choice == 6) {
+        _visit_store("Phone Company", [
+            { name => "Add Phone Line", cost => 200, effect => { phone_lines => 1 } },
+            { name => "Remove Phone Line", cost => -100, effect => { phone_lines => -1 } }
         ], $player_stats_ref);
     } else {
         print "Exiting the mall.\n";
@@ -111,6 +117,9 @@ sub display_admin_console {
     my $hardware_list = Data::get_data('cpu');
     my $current_hardware = $hardware_list->[$player_stats->{hardware_level}] // 'Unknown';
 
+    my $modem_list = Data::get_data('modems');
+    my $current_modem = $modem_list->[$player_stats->{modem_level}] // 'Unknown';
+
     print "===========================================\n";
     print "*** $bbs_name Admin Console ***\n";
     print "Date and Time: $formatted_time\n";
@@ -118,6 +127,7 @@ sub display_admin_console {
     print " Free Users: $player_stats->{free_users}     |  Bank acct: \$ $player_stats->{money}\n";
     print " Paying Users: $player_stats->{paying_users}   |  Employees: $player_stats->{employees}\n";
     print " Daily Actions Remaining: $player_stats->{actions_remaining} / $player_stats->{daily_action_limit}\n";
+    print " Phone Lines: $player_stats->{phone_lines}   |  Modem Speed: $current_modem\n";
     print " Hardware: $current_hardware\n";
     print "===========================================\n\n";
     print "    W - Work on your BBS to attract users and resources.\n";

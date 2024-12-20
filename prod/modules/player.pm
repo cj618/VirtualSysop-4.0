@@ -7,35 +7,39 @@ use Data;
 
 # Player stats storage
 my %player_data = (
-    free_users        => 0,
-    paying_users      => 0,
-    money             => 1000,  # Initial money for demonstration purposes
-    employees         => 0,
-    satisfaction      => 50,
-    expenses          => 0,
-    actions_remaining => 100,
+    free_users         => 0,
+    paying_users       => 0,
+    money              => 1000,  # Initial money for demonstration purposes
+    employees          => 1,
+    satisfaction       => 50,
+    expenses           => 0,
+    actions_remaining  => 100,
     daily_action_limit => 100,
-    last_action_date  => strftime("%Y-%m-%d", localtime),
-    inventory         => {},   # Inventory for purchased items
-    achievements      => [],   # Initialize as an array reference
-    hardware_level    => 0,    # Tracks CPU hardware level
+    last_action_date   => strftime("%Y-%m-%d", localtime),
+    inventory          => {},   # Inventory for purchased items
+    achievements       => [],   # Initialize as an array reference
+    hardware_level     => 0,    # Tracks CPU hardware level
+    phone_lines        => 1,    # Initial number of phone lines
+    modem_level        => 0,    # Tracks the player's modem level
 );
 
 # Initialize player stats
 sub initialize {
     %player_data = (
-        free_users        => 0,
-        paying_users      => 0,
-        money             => 1000,
-        employees         => 0,
-        satisfaction      => 50,
-        expenses          => 0,
-        actions_remaining => 100,
+        free_users         => 0,
+        paying_users       => 0,
+        money              => 1000,
+        employees          => 1,
+        satisfaction       => 50,
+        expenses           => 0,
+        actions_remaining  => 100,
         daily_action_limit => 100,
-        last_action_date  => strftime("%Y-%m-%d", localtime),
-        inventory         => {},   # Initialize inventory
-        achievements      => [],
-        hardware_level    => 0,    # Initial hardware level
+        last_action_date   => strftime("%Y-%m-%d", localtime),
+        inventory          => {},
+        achievements       => [],
+        hardware_level     => 0,
+        phone_lines        => 1,
+        modem_level        => 0,
     );
 }
 
@@ -91,9 +95,53 @@ sub upgrade_hardware {
     if ($player_data{hardware_level} < @$cpu_list - 1) {
         $player_data{hardware_level}++;
         my $new_hardware = $cpu_list->[$player_data{hardware_level}];
-        Event::log_event({ description => "Hardware upgraded to: $new_hardware", impact => { satisfaction => 5 } });
+        print "Hardware upgraded to: $new_hardware\n";
         $player_data{satisfaction} += 5;  # Increase satisfaction due to upgrade
     }
+}
+
+# Purchase a modem
+sub purchase_modem {
+    my $modem_list = Data::get_data('modems');
+    return unless @$modem_list;
+
+    if ($player_data{modem_level} < @$modem_list - 1) {
+        my $next_modem = $modem_list->[$player_data{modem_level} + 1];
+
+        if ($player_data{money} >= $next_modem->{cost}) {
+            $player_data{money} -= $next_modem->{cost};
+            $player_data{modem_level}++;
+            print "Purchased modem: $next_modem->{name}\n";
+        } else {
+            print "Not enough money to purchase: $next_modem->{name}\n";
+        }
+    } else {
+        print "You already have the best modem available!\n";
+    }
+}
+
+# Add or remove phone lines
+sub modify_phone_lines {
+    my ($lines_to_add) = @_;
+    my $cost_per_line = 50;
+    my $total_cost = $lines_to_add * $cost_per_line;
+
+    if ($lines_to_add > 0 && $player_data{money} >= $total_cost) {
+        $player_data{phone_lines} += $lines_to_add;
+        $player_data{money} -= $total_cost;
+        print "Added $lines_to_add phone lines for \$ $total_cost.\n";
+    } elsif ($lines_to_add < 0 && $player_data{phone_lines} + $lines_to_add >= 1) {
+        $player_data{phone_lines} += $lines_to_add;
+        print "Removed " . abs($lines_to_add) . " phone lines.\n";
+    } else {
+        print "Invalid operation. Either insufficient funds or trying to reduce below 1 line.\n";
+    }
+}
+
+# Check for upgrades based on player stats and milestones
+sub check_for_upgrades {
+    upgrade_hardware();
+    # Add more conditions for upgrades if needed
 }
 
 # Save game to file

@@ -28,6 +28,8 @@ sub load_file {
         _parse_list_file($filename, 'viruses');
     } elsif ($filename =~ /CPU\.DAT$/) {
         _parse_list_file($filename, 'cpu');
+    } elsif ($filename =~ /modems\.dat$/) {
+        _parse_modems_file($filename);
     } else {
         warn "Unknown file type: $filename\n";
     }
@@ -105,6 +107,23 @@ sub _parse_list_file {
     close $fh;
 }
 
+# Parse modems.dat
+sub _parse_modems_file {
+    my ($filename) = @_;
+    open my $fh, '<', $filename or die "Cannot open $filename: $!\n";
+
+    my @modems;
+    while (my $line = <$fh>) {
+        chomp($line);
+        next if $line =~ /^\s*$/;  # Skip empty lines
+        my ($name, $speed, $cost) = split /\|/, $line;
+        push @modems, { name => $name, speed => $speed, cost => $cost };
+    }
+
+    $data_store{modems} = \@modems;
+    close $fh;
+}
+
 # Randomly trigger less frequent hardware upgrades
 sub random_hardware_upgrade {
     my $probability = int(rand(100));
@@ -112,4 +131,3 @@ sub random_hardware_upgrade {
 }
 
 1; # Return true for module loading
-
