@@ -1,5 +1,11 @@
 #!/usr/bin/perl
 
+#
+# Virtual SysOp 4.0 
+#
+# DEVELOPMENT VERSION
+#
+
 use strict;
 use warnings;
 use File::Path qw(make_path);
