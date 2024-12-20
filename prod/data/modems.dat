@@ -7,12 +7,12 @@ Practical Peripherals PM14400FXSA (14.4k bps)|14400
 US Robotics Sportster 14.4 (14.4k bps)|14400
 AT&T Dataport 14.4 (14.4k bps)|14400
 SupraFAXModem 14.4 (14.4k bps)|14400
-Cardinal MVP1440 (14.4k bps)|14400
+Cardinal MVP9600 (9600 baud)|9600
 Telebit TrailBlazer (9600+ bps PEP protocol)|9600
-Hayes Smartmodem 2400 (2400 bps)|2400
-Zoom Telephonics 2400 (2400 bps)|2400
+Hayes Smartmodem 2400 (2400 bauds)|2400
+Zoom Telephonics 2400 (2400 baud)|2400
 Avatex 2400 (2400 baud)|2400
-GVC 2400bps (2400 bps)|2400
+GVC 2400bps (2400 baud)|2400
 Commodore 1670 - 1200 baud|1200
 Radio Shack 1200 - 1200 baud|1200
 Commodore VICMODEM - 300 baud|300
