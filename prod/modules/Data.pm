@@ -16,19 +16,19 @@ sub load_file {
     }
 
     # Determine file type based on name and parse accordingly
-    if ($filename =~ /msgsa\.dat$/) {
+    if ($filename =~ /msgsa\.dat$/i) {
         _parse_msg_file($filename, 'msgsa');
-    } elsif ($filename =~ /msgsr\.dat$/) {
+    } elsif ($filename =~ /msgsr\.dat$/i) {
         _parse_msg_file($filename, 'msgsr');
-    } elsif ($filename =~ /msgsv\.dat$/) {
+    } elsif ($filename =~ /msgsv\.dat$/i) {
         _parse_msg_file($filename, 'msgsv');
-    } elsif ($filename =~ /text\.dat$/) {
+    } elsif ($filename =~ /text\.dat$/i) {
         _parse_text_file($filename);
-    } elsif ($filename =~ /virus\.dat$/) {
+    } elsif ($filename =~ /virus\.dat$/i) {
         _parse_list_file($filename, 'viruses');
-    } elsif ($filename =~ /CPU\.DAT$/) {
+    } elsif ($filename =~ /cpu\.dat$/i) {
         _parse_list_file($filename, 'cpu');
-    } elsif ($filename =~ /modems\.dat$/) {
+    } elsif ($filename =~ /modems\.dat$/i) {
         _parse_modems_file($filename);
     } else {
         warn "Unknown file type: $filename\n";
@@ -117,6 +117,7 @@ sub _parse_modems_file {
         chomp($line);
         next if $line =~ /^\s*$/;  # Skip empty lines
         my ($name, $speed, $cost) = split /\|/, $line;
+        $cost //= 0;
         push @modems, { name => $name, speed => $speed, cost => $cost };
     }
 

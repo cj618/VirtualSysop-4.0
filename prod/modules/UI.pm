@@ -95,6 +95,18 @@ sub _visit_store {
 
     if ($choice >= 1 && $choice <= @$items) {
         my $item = $items->[$choice - 1];
+        if (exists $item->{effect}{phone_lines}
+            && ($player_stats_ref->{phone_lines} + $item->{effect}{phone_lines} < 1)) {
+            print "You must keep at least one phone line.\n";
+            return;
+        }
+        if (exists $item->{effect}{modem_level} && $item->{effect}{modem_level} > 0) {
+            my $modem_list = Data::get_data('modems') // [];
+            if (!@$modem_list || $player_stats_ref->{modem_level} + $item->{effect}{modem_level} > $#$modem_list) {
+                print "No better modem is available at this time.\n";
+                return;
+            }
+        }
         if ($player_stats_ref->{money} >= $item->{cost}) {
             $player_stats_ref->{money} -= $item->{cost};
             foreach my $key (keys %{$item->{effect}}) {
@@ -114,11 +126,15 @@ sub display_admin_console {
     my ($bbs_name, $player_stats, $current_time) = @_;
     my $formatted_time = POSIX::strftime("%Y-%m-%d %H:%M:%S", localtime($current_time));
 
-    my $hardware_list = Data::get_data('cpu');
+    my $hardware_list = Data::get_data('cpu') // [];
     my $current_hardware = $hardware_list->[$player_stats->{hardware_level}] // 'Unknown';
 
-    my $modem_list = Data::get_data('modems');
+    my $modem_list = Data::get_data('modems') // [];
     my $current_modem = $modem_list->[$player_stats->{modem_level}] // 'Unknown';
+    if (ref($current_modem) eq 'HASH') {
+        my $speed = $current_modem->{speed} ? " ($current_modem->{speed} baud)" : '';
+        $current_modem = ($current_modem->{name} // 'Unknown') . $speed;
+    }
 
     print "===========================================\n";
     print "*** $bbs_name Admin Console ***\n";
