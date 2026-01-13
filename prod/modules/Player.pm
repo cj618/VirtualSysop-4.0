@@ -100,6 +100,23 @@ sub upgrade_hardware {
     }
 }
 
+sub upgrade_modem {
+    my $modem_list = Data::get_data('modems') // [];
+    return unless @$modem_list;
+
+    if ($player_data{modem_level} < @$modem_list - 1) {
+        $player_data{modem_level}++;
+        my $new_modem = $modem_list->[$player_data{modem_level}];
+        my $display_name = $new_modem;
+        if (ref($new_modem) eq 'HASH') {
+            my $speed = $new_modem->{speed} ? " ($new_modem->{speed} baud)" : '';
+            $display_name = ($new_modem->{name} // 'Unknown') . $speed;
+        }
+        print "Modem upgraded to: $display_name\n";
+        $player_data{satisfaction} += 3;
+    }
+}
+
 # Purchase a modem
 sub purchase_modem {
     my $modem_list = Data::get_data('modems');
@@ -142,6 +159,9 @@ sub modify_phone_lines {
 sub check_for_upgrades {
     if (Data::random_hardware_upgrade()) {
         upgrade_hardware();
+    }
+    if (Data::random_modem_upgrade()) {
+        upgrade_modem();
     }
     _maybe_trigger_setback();
 }
