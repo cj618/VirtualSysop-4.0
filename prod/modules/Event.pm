@@ -92,7 +92,7 @@ sub network_events {
 # Trigger work-related events from msgsa.dat
 sub trigger_work_event {
     my $events = Data::get_data('msgsa');
-    return unless @$events;
+    return unless $events && @$events;
 
     my $event = $events->[rand @$events];
 
@@ -107,7 +107,7 @@ sub trigger_work_event {
 # Trigger user mail from msgsr.dat
 sub trigger_mail_event {
     my $mail = Data::get_data('msgsr');
-    return unless @$mail;
+    return unless $mail && @$mail;
 
     my $message = $mail->[rand @$mail];
 
@@ -121,7 +121,7 @@ sub trigger_mail_event {
 # Trigger a virus event from virus.dat
 sub trigger_virus_event {
     my $viruses = Data::get_data('viruses');
-    return unless @$viruses;
+    return unless $viruses && @$viruses;
 
     my $virus_name = $viruses->[rand @$viruses];
 
@@ -137,7 +137,7 @@ sub trigger_virus_event {
 # Trigger a random disaster from msgsv.dat
 sub trigger_disaster_event {
     my $disasters = Data::get_data('msgsv');
-    return unless @$disasters;
+    return unless $disasters && @$disasters;
 
     my $disaster = $disasters->[rand @$disasters];
 
@@ -145,7 +145,7 @@ sub trigger_disaster_event {
         description => $disaster->{text},
         impact      => {
             satisfaction => $disaster->{value},
-            money        => $disaster->{action},
+            money        => 0,
         },
     };
 }

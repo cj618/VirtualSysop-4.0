@@ -2,6 +2,7 @@ package Reports;
 
 use strict;
 use warnings;
+use POSIX qw(strftime);
 
 # Generate a report on user growth
 sub generate_user_growth_report {
@@ -12,7 +13,7 @@ sub generate_user_growth_report {
     print "===========================================\n";
 
     foreach my $entry (@$stats_history) {
-        my $time = POSIX::strftime("%Y-%m-%d %H:%M:%S", localtime($entry->{timestamp}));
+        my $time = strftime("%Y-%m-%d %H:%M:%S", localtime($entry->{timestamp}));
         print "$time - Free Users: $entry->{free_users}, Paying Users: $entry->{paying_users}\n";
     }
 
@@ -28,7 +29,7 @@ sub generate_satisfaction_report {
     print "===========================================\n";
 
     foreach my $entry (@$stats_history) {
-        my $time = POSIX::strftime("%Y-%m-%d %H:%M:%S", localtime($entry->{timestamp}));
+        my $time = strftime("%Y-%m-%d %H:%M:%S", localtime($entry->{timestamp}));
         print "$time - Satisfaction: $entry->{satisfaction}, Employees: $entry->{employees}\n";
     }
 
@@ -44,7 +45,7 @@ sub generate_financial_report {
     print "===========================================\n";
 
     foreach my $entry (@$stats_history) {
-        my $time = POSIX::strftime("%Y-%m-%d %H:%M:%S", localtime($entry->{timestamp}));
+        my $time = strftime("%Y-%m-%d %H:%M:%S", localtime($entry->{timestamp}));
         print "$time - Money: \$ $entry->{money}, Expenses: \$ $entry->{expenses}\n";
     }
 
@@ -78,9 +79,13 @@ sub generate_rival_report {
     print "Rival Interactions Report\n";
     print "===========================================\n";
 
-    foreach my $interaction (@$rival_interactions) {
-        my $time = POSIX::strftime("%Y-%m-%d %H:%M:%S", localtime($interaction->{timestamp}));
-        print "$time - Rival: $interaction->{rival}, Action: $interaction->{action}, Result: $interaction->{result}\n";
+    if (!$rival_interactions || !@$rival_interactions) {
+        print "No rival interactions recorded yet.\n";
+    } else {
+        foreach my $interaction (@$rival_interactions) {
+            my $time = strftime("%Y-%m-%d %H:%M:%S", localtime($interaction->{timestamp}));
+            print "$time - Rival: $interaction->{rival}, Action: $interaction->{action}, Result: $interaction->{result}\n";
+        }
     }
 
     print "===========================================\n\n";

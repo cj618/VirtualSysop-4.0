@@ -51,6 +51,9 @@ if (uc($choice) eq 'L') {
         ($bbs_name) = $save_file =~ m|/([^/]+)\.vso$|;
     } else {
         print "Save file not found. Starting a new game instead.\n";
+        print "Enter the name of your BBS: ";
+        $bbs_name = <STDIN>;
+        chomp($bbs_name);
         Player::initialize();
     }
 } else {
@@ -66,11 +69,12 @@ Data::load_file('data/msgsr.dat');
 Data::load_file('data/msgsv.dat');
 Data::load_file('data/text.dat');
 Data::load_file('data/virus.dat');
-Data::load_file('data/CPU.DAT');
+Data::load_file('data/cpu.dat');
 Data::load_file('data/modems.dat');
 
 # Track player stats history for reports
 my @stats_history;
+my @rival_history;
 
 # Game loop state
 my $game_running = 1;
@@ -80,6 +84,11 @@ while ($game_running) {
     # Capture current player stats for history tracking
     my %player_stats = Player::get_stats();
     %player_stats = Score::recalculate_metrics(%player_stats);
+    my @new_achievements = Score::check_achievements(%player_stats);
+    if (@new_achievements) {
+        push @{$player_stats{achievements}}, @new_achievements;
+    }
+    Player::update_stats(%player_stats);
 
     my $current_time = time;
     push @stats_history, { %player_stats, timestamp => $current_time };
@@ -98,6 +107,8 @@ while ($game_running) {
         if (Player::deduct_actions(10)) {
             $player_stats{actions_remaining} -= 10;
             my @events = Event::trigger_events();
+            my $work_event = Event::trigger_work_event();
+            push @events, $work_event if $work_event;
             foreach my $event (@events) {
                 UI::display_event($event);
                 # Apply event impacts to player stats
@@ -118,6 +129,8 @@ while ($game_running) {
         if (Player::deduct_actions(8)) {
             $player_stats{actions_remaining} -= 8;
             my @events = Event::trigger_events();
+            my $scan_event = Event::trigger_disaster_event();
+            push @events, $scan_event if $scan_event;
             foreach my $event (@events) {
                 UI::display_event($event);
                 # Apply event impacts to player stats
@@ -151,7 +164,7 @@ while ($game_running) {
         } elsif ($report_choice eq '4') {
             Reports::generate_inventory_report(\%player_stats);
         } elsif ($report_choice eq '5') {
-            Reports::generate_rival_report(\@stats_history);
+            Reports::generate_rival_report(\@rival_history);
         } elsif (uc($report_choice) eq 'C') {
             print "Returning to main menu.\n";
         } else {
@@ -173,18 +186,35 @@ while ($game_running) {
 
             if (uc($action) eq 'P') {
                 my $result = Rival::interact_with_rival($rival_name, 'partnership');
-                foreach my $key (keys %$result) {
-                    $player_stats{$key} += $result->{$key};
+                if ($result) {
+                    foreach my $key (keys %$result) {
+                        $player_stats{$key} += $result->{$key};
+                    }
+                    push @rival_history, {
+                        timestamp => time,
+                        rival     => $rival_name,
+                        action    => 'partnership',
+                        result    => "Gained $result->{free_users} free users and \$ $result->{money}.",
+                    };
                 }
             } elsif (uc($action) eq 'C') {
                 my $result = Rival::interact_with_rival($rival_name, 'competition');
-                foreach my $key (keys %$result) {
-                    $player_stats{$key} += $result->{$key};
+                if ($result) {
+                    foreach my $key (keys %$result) {
+                        $player_stats{$key} += $result->{$key};
+                    }
+                    push @rival_history, {
+                        timestamp => time,
+                        rival     => $rival_name,
+                        action    => 'competition',
+                        result    => "Gained $result->{free_users} free users and \$ $result->{money}.",
+                    };
                 }
             } else {
                 print "Invalid action. Returning to main menu.\n";
             }
         }
+        Player::update_stats(%player_stats);
     } elsif ($command eq 'U') {
         # Read User Mail command
         if (Player::deduct_actions(5)) {
