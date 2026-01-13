@@ -131,4 +131,9 @@ sub random_hardware_upgrade {
     return $probability < 5;  # 5% chance for upgrade event
 }
 
+sub random_modem_upgrade {
+    my $probability = int(rand(100));
+    return $probability < 5;  # 5% chance for upgrade event
+}
+
 1; # Return true for module loading

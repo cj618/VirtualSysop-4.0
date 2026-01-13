@@ -96,9 +96,6 @@ while ($game_running) {
     # Display BBS admin console header
     UI::display_admin_console($bbs_name, \%player_stats, $current_time);
 
-    # Check for hardware upgrades
-    Player::check_for_upgrades();
-
     # Get player command
     my $command = UI::get_player_input();
 
@@ -117,6 +114,7 @@ while ($game_running) {
                 }
             }
             Player::update_stats(%player_stats);
+            Player::check_for_upgrades();
         } else {
             UI::display_error("Not enough actions remaining for this task.");
         }
@@ -139,6 +137,7 @@ while ($game_running) {
                 }
             }
             Player::update_stats(%player_stats);
+            Player::check_for_upgrades();
         } else {
             UI::display_error("Not enough actions remaining for this task.");
         }
@@ -238,6 +237,7 @@ while ($game_running) {
             } else {
                 print "No new mail at this time.\n";
             }
+            Player::check_for_upgrades();
         } else {
             UI::display_error("Not enough actions remaining to read mail.");
         }

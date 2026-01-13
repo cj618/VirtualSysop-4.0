@@ -100,6 +100,23 @@ sub upgrade_hardware {
     }
 }
 
+sub upgrade_modem {
+    my $modem_list = Data::get_data('modems') // [];
+    return unless @$modem_list;
+
+    if ($player_data{modem_level} < @$modem_list - 1) {
+        $player_data{modem_level}++;
+        my $new_modem = $modem_list->[$player_data{modem_level}];
+        my $display_name = $new_modem;
+        if (ref($new_modem) eq 'HASH') {
+            my $speed = $new_modem->{speed} ? " ($new_modem->{speed} baud)" : '';
+            $display_name = ($new_modem->{name} // 'Unknown') . $speed;
+        }
+        print "Modem upgraded to: $display_name\n";
+        $player_data{satisfaction} += 3;
+    }
+}
+
 # Purchase a modem
 sub purchase_modem {
     my $modem_list = Data::get_data('modems');
@@ -140,8 +157,31 @@ sub modify_phone_lines {
 
 # Check for upgrades based on player stats and milestones
 sub check_for_upgrades {
-    upgrade_hardware();
-    # Add more conditions for upgrades if needed
+    if (Data::random_hardware_upgrade()) {
+        upgrade_hardware();
+    }
+    if (Data::random_modem_upgrade()) {
+        upgrade_modem();
+    }
+    _maybe_trigger_setback();
+}
+
+sub _maybe_trigger_setback {
+    my $setback_chance = 3; # percent chance per check
+    return if int(rand(100)) >= $setback_chance;
+
+    if ($player_data{hardware_level} > 0 && int(rand(100)) < 50) {
+        $player_data{hardware_level}--;
+        my $cpu_list = Data::get_data('cpu') // [];
+        my $current_hardware = $cpu_list->[$player_data{hardware_level}] // 'Unknown';
+        print "Hardware failure! Downgraded to: $current_hardware\n";
+        $player_data{satisfaction} -= 5;
+    } else {
+        print "Unexpected maintenance costs hit your budget.\n";
+        $player_data{money} -= 100 if $player_data{money} >= 100;
+        $player_data{satisfaction} -= 3;
+    }
+    $player_data{satisfaction} = 0 if $player_data{satisfaction} < 0;
 }
 
 # Save game to file
